@@ -1,0 +1,95 @@
+import { ModelConfig } from '@/lib/admin/types'
+import { Mail } from 'lucide-react'
+
+export const contactSubmissionConfig: ModelConfig = {
+  name: 'ContactSubmission',
+  namePlural: 'Contact Submissions',
+  nameSingular: 'Contact Submission',
+  icon: Mail,
+  description: 'View contact form submissions',
+  primaryField: 'name',
+
+  defaultSort: { field: 'createdAt', direction: 'desc' },
+  searchFields: ['name', 'email', 'message'],
+  perPage: 20,
+
+  fields: [
+    {
+      name: 'id',
+      type: 'number',
+      label: 'ID',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: true,
+    },
+    {
+      name: 'name',
+      type: 'string',
+      label: 'Name',
+      required: true,
+      showInList: true,
+      sortable: true,
+      searchable: true,
+      readonly: true,
+    },
+    {
+      name: 'email',
+      type: 'email',
+      label: 'Email',
+      required: true,
+      showInList: true,
+      sortable: true,
+      searchable: true,
+      readonly: true,
+    },
+    {
+      name: 'subject',
+      type: 'string',
+      label: 'Subject',
+      showInList: true,
+      readonly: true,
+    },
+    {
+      name: 'message',
+      type: 'text',
+      label: 'Message',
+      required: true,
+      showInList: false,
+      searchable: true,
+      readonly: true,
+    },
+    {
+      name: 'status',
+      type: 'select',
+      label: 'Status',
+      required: true,
+      defaultValue: 'new',
+      options: [
+        { label: 'New', value: 'new' },
+        { label: 'Read', value: 'read' },
+        { label: 'Responded', value: 'responded' },
+        { label: 'Archived', value: 'archived' },
+      ],
+      showInList: true,
+      sortable: true,
+    },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Submitted At',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: true,
+      sortable: true,
+    },
+  ],
+
+  permissions: {
+    create: false,
+    read: true,
+    update: true,
+    delete: true,
+  },
+}

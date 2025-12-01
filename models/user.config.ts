@@ -1,0 +1,89 @@
+import { ModelConfig } from '@/lib/admin/types'
+import { User } from 'lucide-react'
+
+export const userConfig: ModelConfig = {
+  name: 'User',
+  namePlural: 'Users',
+  nameSingular: 'User',
+  icon: User,
+  description: 'Manage system users',
+  primaryField: 'name',
+
+  defaultSort: { field: 'createdAt', direction: 'desc' },
+  searchFields: ['name', 'email'],
+  perPage: 10,
+
+  fields: [
+    {
+      name: 'id',
+      type: 'number',
+      label: 'ID',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: true,
+    },
+    {
+      name: 'email',
+      type: 'email',
+      label: 'Email Address',
+      required: true,
+      placeholder: 'user@example.com',
+      showInList: true,
+      sortable: true,
+      searchable: true,
+    },
+    {
+      name: 'name',
+      type: 'string',
+      label: 'Full Name',
+      required: true,
+      placeholder: 'John Doe',
+      min: 2,
+      max: 100,
+      showInList: true,
+      sortable: true,
+      searchable: true,
+    },
+    {
+      name: 'role',
+      type: 'select',
+      label: 'Role',
+      required: true,
+      defaultValue: 'user',
+      options: [
+        { label: 'User', value: 'user' },
+        { label: 'Admin', value: 'admin' },
+        { label: 'Editor', value: 'editor' },
+      ],
+      showInList: true,
+      sortable: true,
+    },
+    {
+      name: 'isActive',
+      type: 'boolean',
+      label: 'Active',
+      defaultValue: true,
+      helpText: 'Whether the user account is active',
+      showInList: true,
+      sortable: true,
+    },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Created At',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: true,
+      sortable: true,
+    },
+  ],
+
+  permissions: {
+    create: true,
+    read: true,
+    update: true,
+    delete: true,
+  },
+}

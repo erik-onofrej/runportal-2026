@@ -1,0 +1,114 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Badge } from '@/components/ui/badge'
+import { FieldRendererProps } from '@/lib/admin/types'
+
+interface RelationOption {
+  id: number
+  label: string
+}
+
+export function RelationMultiSelect({ field, value, onChange }: FieldRendererProps) {
+  const [options, setOptions] = useState<RelationOption[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const selectedIds: number[] = Array.isArray(value) ? value : []
+
+  useEffect(() => {
+    if (!field.relation) return
+
+    const fetchOptions = async () => {
+      try {
+        const modelName = field.relation!.model.toLowerCase()
+        const displayField = field.relation!.displayField
+        const response = await fetch(
+          `/api/admin/${modelName}?relation=${field.name}&displayField=${displayField}`
+        )
+        const data = await response.json()
+        setOptions(Array.isArray(data) ? data : [])
+      } catch (err) {
+        console.error('Error fetching relation options:', err)
+        setOptions([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchOptions()
+  }, [field.relation, field.name])
+
+  const toggleSelection = (optionId: number) => {
+    const newSelection = selectedIds.includes(optionId)
+      ? selectedIds.filter((id) => id !== optionId)
+      : [...selectedIds, optionId]
+    onChange(newSelection)
+  }
+
+  const selectedLabels = options
+    .filter((opt) => selectedIds.includes(opt.id))
+    .map((opt) => opt.label)
+
+  if (isLoading) {
+    return <div className="text-sm text-muted-foreground">Loading...</div>
+  }
+
+  return (
+    <div className="space-y-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-full justify-start">
+            {selectedLabels.length > 0
+              ? `${selectedLabels.length} selected`
+              : field.placeholder || `Select ${field.label}...`}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-full" align="start">
+          {options.map((option) => {
+            const isSelected = selectedIds.includes(option.id)
+            return (
+              <DropdownMenuItem
+                key={option.id}
+                onSelect={(e) => {
+                  e.preventDefault()
+                  toggleSelection(option.id)
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      'h-4 w-4 border rounded flex items-center justify-center',
+                      isSelected && 'bg-primary border-primary'
+                    )}
+                  >
+                    {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
+                  </div>
+                  <span>{option.label}</span>
+                </div>
+              </DropdownMenuItem>
+            )
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {selectedLabels.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {selectedLabels.map((label, index) => (
+            <Badge key={index} variant="secondary">
+              {label}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

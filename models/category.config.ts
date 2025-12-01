@@ -1,0 +1,92 @@
+import { ModelConfig } from '@/lib/admin/types'
+import { FolderOpen } from 'lucide-react'
+
+export const categoryConfig: ModelConfig = {
+  name: 'Category',
+  namePlural: 'Categories',
+  nameSingular: 'Category',
+  icon: FolderOpen,
+  description: 'Manage content categories',
+  primaryField: 'name',
+
+  defaultSort: { field: 'sortOrder', direction: 'asc' },
+  searchFields: ['name', 'description'],
+  perPage: 20,
+
+  fields: [
+    {
+      name: 'id',
+      type: 'number',
+      label: 'ID',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: true,
+    },
+    {
+      name: 'name',
+      type: 'string',
+      label: 'Category Name',
+      required: true,
+      placeholder: 'Technology',
+      min: 2,
+      max: 50,
+      showInList: true,
+      sortable: true,
+      searchable: true,
+    },
+    {
+      name: 'description',
+      type: 'text',
+      label: 'Description',
+      placeholder: 'Optional description...',
+      max: 500,
+      showInList: false,
+      searchable: true,
+    },
+    {
+      name: 'color',
+      type: 'string',
+      label: 'Color',
+      defaultValue: '#3B82F6',
+      helpText: 'Hex color code for UI display',
+      pattern: /^#[0-9A-Fa-f]{6}$/,
+      showInList: true,
+    },
+    {
+      name: 'sortOrder',
+      type: 'number',
+      label: 'Sort Order',
+      defaultValue: 0,
+      helpText: 'Order in which categories appear',
+      showInList: true,
+      sortable: true,
+    },
+    {
+      name: 'isVisible',
+      type: 'boolean',
+      label: 'Visible',
+      defaultValue: true,
+      helpText: 'Whether the category is visible to users',
+      showInList: true,
+      sortable: true,
+    },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Created At',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: true,
+      sortable: true,
+    },
+  ],
+
+  permissions: {
+    create: true,
+    read: true,
+    update: true,
+    delete: true,
+  },
+}
