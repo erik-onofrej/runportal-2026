@@ -1,0 +1,107 @@
+import { ModelConfig } from '@/lib/admin/types';
+import { Handshake } from 'lucide-react';
+
+export const partnerConfig: ModelConfig = {
+  name: 'Partner',
+  namePlural: 'Partners',
+  nameSingular: 'Partner',
+  icon: Handshake,
+  description: 'Manage event partners and sponsors',
+  primaryField: 'name',
+
+  defaultSort: { field: 'name', direction: 'asc' },
+  searchFields: ['name', 'description'],
+  perPage: 20,
+
+  fields: [
+    {
+      name: 'id',
+      type: 'number',
+      label: 'ID',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: true,
+    },
+    {
+      name: 'name',
+      type: 'string',
+      label: 'Partner Name',
+      required: true,
+      placeholder: 'SportRun Slovakia',
+      min: 2,
+      max: 200,
+      showInList: true,
+      sortable: true,
+      searchable: true,
+    },
+    {
+      name: 'logo',
+      type: 'string',
+      label: 'Logo URL',
+      placeholder: '/uploads/partners/logo.png',
+      max: 500,
+      helpText: 'Path or URL to partner logo',
+      showInList: false,
+    },
+    {
+      name: 'website',
+      type: 'string',
+      label: 'Website',
+      placeholder: 'https://partner.sk',
+      max: 200,
+      showInList: true,
+    },
+    {
+      name: 'description',
+      type: 'text',
+      label: 'Description',
+      placeholder: 'Brief description...',
+      max: 1000,
+      showInList: false,
+      searchable: true,
+    },
+    {
+      name: 'type',
+      type: 'select',
+      label: 'Type',
+      showInList: true,
+      sortable: true,
+      options: [
+        { value: 'sponsor', label: 'Sponsor' },
+        { value: 'partner', label: 'Partner' },
+        { value: 'media_partner', label: 'Media Partner' },
+      ],
+    },
+    {
+      name: 'events',
+      type: 'relation-many',
+      label: 'Events',
+      showInList: false,
+      relation: {
+        model: 'Event',
+        displayField: 'title',
+        joinTable: 'eventPartner',
+        localKey: 'partnerId',
+        foreignKeyRef: 'eventId',
+        idType: 'number',
+      },
+    },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Created At',
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      showInList: false,
+    },
+  ],
+
+  permissions: {
+    create: true,
+    read: true,
+    update: true,
+    delete: true,
+  },
+};

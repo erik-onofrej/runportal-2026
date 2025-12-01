@@ -13,6 +13,21 @@ import { getCategory, updateCategory } from '@/actions/v2/category.actions'
 import { getGallery, updateGallery } from '@/actions/v2/gallery.actions'
 import { getGalleryImage, updateGalleryImage } from '@/actions/v2/galleryImage.actions'
 import { getContactSubmission, updateContactSubmission } from '@/actions/v2/contactSubmission.actions'
+// Running Events Actions
+import { getRegion, updateRegion } from '@/actions/v2/region.actions'
+import { getDistrict, updateDistrict } from '@/actions/v2/district.actions'
+import { getLocation, updateLocation } from '@/actions/v2/location.actions'
+import { getOrganizer, updateOrganizer } from '@/actions/v2/organizer.actions'
+import { getEvent, updateEvent } from '@/actions/v2/event.actions'
+import { getRun, updateRun } from '@/actions/v2/run.actions'
+import { getRunCategory, updateRunCategory } from '@/actions/v2/runCategory.actions'
+import { getRunEntryFee, updateRunEntryFee } from '@/actions/v2/runEntryFee.actions'
+import { getEventSchedule, updateEventSchedule } from '@/actions/v2/eventSchedule.actions'
+import { getPartner, updatePartner } from '@/actions/v2/partner.actions'
+import { getEventAttachment, updateEventAttachment } from '@/actions/v2/eventAttachment.actions'
+import { getRunner, updateRunner } from '@/actions/v2/runner.actions'
+import { getRegistration, updateRegistration } from '@/actions/v2/registration.actions'
+import { getRunResult, updateRunResult } from '@/actions/v2/runResult.actions'
 
 // Map entity names to their actions
 const actionsMap: Record<string, any> = {
@@ -22,6 +37,21 @@ const actionsMap: Record<string, any> = {
   gallery: { get: getGallery, update: updateGallery },
   galleryimage: { get: getGalleryImage, update: updateGalleryImage },
   contactsubmission: { get: getContactSubmission, update: updateContactSubmission },
+  // Running Events
+  region: { get: getRegion, update: updateRegion },
+  district: { get: getDistrict, update: updateDistrict },
+  location: { get: getLocation, update: updateLocation },
+  organizer: { get: getOrganizer, update: updateOrganizer },
+  event: { get: getEvent, update: updateEvent },
+  run: { get: getRun, update: updateRun },
+  runcategory: { get: getRunCategory, update: updateRunCategory },
+  runentryfee: { get: getRunEntryFee, update: updateRunEntryFee },
+  eventschedule: { get: getEventSchedule, update: updateEventSchedule },
+  partner: { get: getPartner, update: updatePartner },
+  eventattachment: { get: getEventAttachment, update: updateEventAttachment },
+  runner: { get: getRunner, update: updateRunner },
+  registration: { get: getRegistration, update: updateRegistration },
+  runresult: { get: getRunResult, update: updateRunResult },
 }
 
 export default function EditEntityPage({

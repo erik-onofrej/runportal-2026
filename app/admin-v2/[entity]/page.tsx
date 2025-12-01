@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getModelConfig } from '@/lib/admin/config'
@@ -19,6 +19,21 @@ import { getAllCategories, deleteCategory } from '@/actions/v2/category.actions'
 import { getAllGalleries, deleteGallery } from '@/actions/v2/gallery.actions'
 import { getAllGalleryImages, deleteGalleryImage } from '@/actions/v2/galleryImage.actions'
 import { getAllContactSubmissions, deleteContactSubmission } from '@/actions/v2/contactSubmission.actions'
+// Running Events Actions
+import { getAllRegions, deleteRegion } from '@/actions/v2/region.actions'
+import { getAllDistricts, deleteDistrict } from '@/actions/v2/district.actions'
+import { getAllLocations, deleteLocation } from '@/actions/v2/location.actions'
+import { getAllOrganizers, deleteOrganizer } from '@/actions/v2/organizer.actions'
+import { getAllEvents, deleteEvent } from '@/actions/v2/event.actions'
+import { getAllRuns, deleteRun } from '@/actions/v2/run.actions'
+import { getAllRunCategories, deleteRunCategory } from '@/actions/v2/runCategory.actions'
+import { getAllRunEntryFees, deleteRunEntryFee } from '@/actions/v2/runEntryFee.actions'
+import { getAllEventSchedules, deleteEventSchedule } from '@/actions/v2/eventSchedule.actions'
+import { getAllPartners, deletePartner } from '@/actions/v2/partner.actions'
+import { getAllEventAttachments, deleteEventAttachment } from '@/actions/v2/eventAttachment.actions'
+import { getAllRunners, deleteRunner } from '@/actions/v2/runner.actions'
+import { getAllRegistrations, deleteRegistration } from '@/actions/v2/registration.actions'
+import { getAllRunResults, deleteRunResult } from '@/actions/v2/runResult.actions'
 import type { ServiceParams } from '@/lib/admin-v2/types/service.types'
 import type { ActionResponse } from '@/lib/admin-v2/types/action.types'
 
@@ -33,6 +48,21 @@ const actionsMap: Record<string, {
   gallery: { getAll: getAllGalleries, delete: deleteGallery as (ids: (number | string)[]) => Promise<ActionResponse> },
   galleryimage: { getAll: getAllGalleryImages, delete: deleteGalleryImage as (ids: (number | string)[]) => Promise<ActionResponse> },
   contactsubmission: { getAll: getAllContactSubmissions, delete: deleteContactSubmission as (ids: (number | string)[]) => Promise<ActionResponse> },
+  // Running Events
+  region: { getAll: getAllRegions, delete: deleteRegion as (ids: (number | string)[]) => Promise<ActionResponse> },
+  district: { getAll: getAllDistricts, delete: deleteDistrict as (ids: (number | string)[]) => Promise<ActionResponse> },
+  location: { getAll: getAllLocations, delete: deleteLocation as (ids: (number | string)[]) => Promise<ActionResponse> },
+  organizer: { getAll: getAllOrganizers, delete: deleteOrganizer as (ids: (number | string)[]) => Promise<ActionResponse> },
+  event: { getAll: getAllEvents, delete: deleteEvent as (ids: (number | string)[]) => Promise<ActionResponse> },
+  run: { getAll: getAllRuns, delete: deleteRun as (ids: (number | string)[]) => Promise<ActionResponse> },
+  runcategory: { getAll: getAllRunCategories, delete: deleteRunCategory as (ids: (number | string)[]) => Promise<ActionResponse> },
+  runentryfee: { getAll: getAllRunEntryFees, delete: deleteRunEntryFee as (ids: (number | string)[]) => Promise<ActionResponse> },
+  eventschedule: { getAll: getAllEventSchedules, delete: deleteEventSchedule as (ids: (number | string)[]) => Promise<ActionResponse> },
+  partner: { getAll: getAllPartners, delete: deletePartner as (ids: (number | string)[]) => Promise<ActionResponse> },
+  eventattachment: { getAll: getAllEventAttachments, delete: deleteEventAttachment as (ids: (number | string)[]) => Promise<ActionResponse> },
+  runner: { getAll: getAllRunners, delete: deleteRunner as (ids: (number | string)[]) => Promise<ActionResponse> },
+  registration: { getAll: getAllRegistrations, delete: deleteRegistration as (ids: (number | string)[]) => Promise<ActionResponse> },
+  runresult: { getAll: getAllRunResults, delete: deleteRunResult as (ids: (number | string)[]) => Promise<ActionResponse> },
 }
 
 export default function EntityListPage({
@@ -54,6 +84,13 @@ export default function EntityListPage({
   const debouncedSearch = useDebounce(search, 300)
 
   const actions = actionsMap[entity]
+
+  // Reset data when entity changes to prevent stale data issues
+  useEffect(() => {
+    setData([])
+    setPage(1)
+    setSearch('')
+  }, [entity])
 
   useEffect(() => {
     if (!config || !actions) return
@@ -115,8 +152,8 @@ export default function EntityListPage({
     return <div>Actions not found for {entity}</div>
   }
 
-  // Build columns from config
-  const columns: ColumnDef<Record<string, unknown>>[] = [
+  // Build columns from config - memoized to prevent table reinitializations
+  const columns: ColumnDef<Record<string, unknown>>[] = useMemo(() => [
     ...config.fields
       .filter((field) => field.showInList)
       .map((field) => ({
@@ -194,7 +231,7 @@ export default function EntityListPage({
         )
       },
     },
-  ]
+  ], [config, entity, router])
 
   return (
     <div className="space-y-4">
@@ -224,7 +261,7 @@ export default function EntityListPage({
         <div>Loading...</div>
       ) : (
         <>
-          <DataTable columns={columns} data={data} />
+          <DataTable key={entity} columns={columns} data={data} />
           <DataTablePagination
             page={page}
             totalPages={totalPages}

@@ -29,6 +29,7 @@ model User {
   blogs    Blog[]
   sessions Session[]
   accounts Account[]
+  runner   Runner?
 }
 
 // Blog Model (renamed from Post)
@@ -140,7 +141,8 @@ model Gallery {
   updatedAt   DateTime       @updatedAt
 
   // Relations
-  images GalleryImage[]
+  images         GalleryImage[]
+  eventGalleries EventGallery[]
 }
 
 // Gallery Image Model
@@ -175,4 +177,377 @@ model ContactSubmission {
 
   @@index([status])
   @@index([createdAt])
+}
+
+// ============================================================================
+// RUNNING EVENTS MODELS
+// ============================================================================
+
+// Geographic Reference (Slovak-specific)
+
+model Region {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  code      String     @unique
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  districts District[]
+  locations Location[]
+
+  @@index([code])
+}
+
+model District {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String
+  regionId  Int
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  region    Region     @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  locations Location[]
+
+  @@unique([regionId, name])
+  @@index([regionId])
+  @@index([code])
+}
+
+// Location
+
+model Location {
+  id           Int      @id @default(autoincrement())
+  name         String
+  street       String?
+  city         String
+  postalCode   String?
+  districtId   Int
+  regionId     Int
+  gpsLatitude  Float?
+  gpsLongitude Float?
+  locationNote String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
+  region   Region   @relation(fields: [regionId], references: [id], onDelete: Restrict)
+  events   Event[]
+
+  @@index([districtId])
+  @@index([regionId])
+  @@index([city])
+}
+
+// Organizer
+
+model Organizer {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?  @db.Text
+  email       String?
+  phone       String?
+  website     String?
+  logo        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  events Event[]
+
+  @@index([name])
+}
+
+// Event (main container for one or more runs)
+
+model Event {
+  id                    Int      @id @default(autoincrement())
+  title                 String
+  slug                  String   @unique
+  description           String?  @db.Text
+  startDate             DateTime
+  endDate               DateTime
+  locationId            Int
+  organizerId           Int
+  contactEmail          String?
+  contactPhone          String?
+  bankAccount           String?
+  paymentNote           String?  @db.Text
+  coverImage            String?
+  status                String   @default("draft")
+  registrationOpenDate  DateTime?
+  registrationCloseDate DateTime?
+  maxParticipants       Int?
+  longDescription       String?  @db.Text
+  rules                 String?  @db.Text
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  location    Location          @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  organizer   Organizer         @relation(fields: [organizerId], references: [id], onDelete: Restrict)
+  runs        Run[]
+  schedule    EventSchedule[]
+  partners    EventPartner[]
+  attachments EventAttachment[]
+  galleries   EventGallery[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([startDate])
+  @@index([locationId])
+  @@index([organizerId])
+}
+
+// Run (individual race within an event)
+
+model Run {
+  id              Int      @id @default(autoincrement())
+  eventId         Int
+  name            String
+  distance        Float
+  elevationGain   Int?
+  surface         String?
+  startTime       DateTime
+  maxParticipants Int?
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categories    RunCategory[]
+  entryFees     RunEntryFee[]
+  registrations Registration[]
+  results       RunResult[]
+
+  @@index([eventId])
+  @@index([startTime])
+}
+
+// RunCategory (age/gender groups)
+
+model RunCategory {
+  id        Int      @id @default(autoincrement())
+  runId     Int
+  name      String
+  code      String
+  minAge    Int?
+  maxAge    Int?
+  gender    String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  run           Run            @relation(fields: [runId], references: [id], onDelete: Cascade)
+  registrations Registration[]
+  results       RunResult[]
+
+  @@unique([runId, code])
+  @@index([runId])
+}
+
+// RunEntryFee (pricing by date)
+
+model RunEntryFee {
+  id        Int      @id @default(autoincrement())
+  runId     Int
+  name      String
+  amount    Float
+  currency  String   @default("EUR")
+  validFrom DateTime
+  validTo   DateTime
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  run Run @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([validFrom, validTo])
+}
+
+// EventSchedule
+
+model EventSchedule {
+  id          Int       @id @default(autoincrement())
+  eventId     Int
+  title       String
+  description String?   @db.Text
+  startTime   DateTime
+  endTime     DateTime?
+  location    String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([startTime])
+}
+
+// Partner
+
+model Partner {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  logo        String?
+  website     String?
+  description String?  @db.Text
+  type        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  events EventPartner[]
+
+  @@index([name])
+}
+
+// EventPartner (many-to-many join table)
+
+model EventPartner {
+  eventId   Int
+  partnerId Int
+  level     String? @default("general")
+  sortOrder Int     @default(0)
+
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, partnerId])
+  @@index([eventId])
+  @@index([partnerId])
+}
+
+// EventAttachment
+
+model EventAttachment {
+  id          Int      @id @default(autoincrement())
+  eventId     Int
+  title       String
+  fileUrl     String
+  fileType    String?
+  fileSize    Int?
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+// EventGallery (link to existing Gallery model)
+
+model EventGallery {
+  eventId   Int
+  galleryId Int
+  sortOrder Int @default(0)
+
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, galleryId])
+  @@index([eventId])
+  @@index([galleryId])
+}
+
+// Runner (guest-first, optional accounts)
+
+model Runner {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  userId      String?  @unique
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime
+  gender      String
+  phone       String?
+  city        String?
+  country     String?  @default("Slovakia")
+  club        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  registrations Registration[]
+  results       RunResult[]
+
+  @@index([email])
+  @@index([userId])
+}
+
+// Registration (sign-ups for runs)
+
+model Registration {
+  id                 Int      @id @default(autoincrement())
+  runId              Int
+  categoryId         Int
+  runnerId           String?
+  guestFirstName     String
+  guestLastName      String
+  guestEmail         String
+  guestPhone         String?
+  guestDateOfBirth   DateTime
+  guestGender        String
+  guestCity          String?
+  guestClub          String?
+  registrationNumber String   @unique
+  registeredAt       DateTime @default(now())
+  paid               Boolean  @default(false)
+  paidAmount         Float?
+  paidAt             DateTime?
+  paymentNote        String?
+  presented          Boolean  @default(false)
+  bibNumber          String?
+  status             String   @default("pending")
+  notes              String?  @db.Text
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  run      Run         @relation(fields: [runId], references: [id], onDelete: Cascade)
+  category RunCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  runner   Runner?     @relation(fields: [runnerId], references: [id], onDelete: SetNull)
+  result   RunResult?
+
+  @@index([runId])
+  @@index([categoryId])
+  @@index([runnerId])
+  @@index([guestEmail])
+  @@index([registrationNumber])
+  @@index([status])
+}
+
+// RunResult (race outcomes)
+
+model RunResult {
+  id             Int       @id @default(autoincrement())
+  registrationId Int       @unique
+  runId          Int
+  categoryId     Int
+  runnerId       String?
+  overallPlace   Int?
+  categoryPlace  Int?
+  finishTime     Int?
+  gunTime        Int?
+  resultStatus   String    @default("finished")
+  pace           Float?
+  splits         Json?
+  importedAt     DateTime?
+  importSource   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  run          Run          @relation(fields: [runId], references: [id], onDelete: Cascade)
+  category     RunCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  runner       Runner?      @relation(fields: [runnerId], references: [id], onDelete: SetNull)
+
+  @@index([runId])
+  @@index([categoryId])
+  @@index([runnerId])
+  @@index([overallPlace])
+  @@index([resultStatus])
 }

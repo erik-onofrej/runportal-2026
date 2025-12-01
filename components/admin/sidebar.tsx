@@ -41,7 +41,9 @@ export function AdminSidebar() {
           {models.map((model) => {
             const Icon = model.icon
             const entityPath = `/admin/${model.name.toLowerCase()}`
-            const isActive = pathname.startsWith(entityPath)
+            // Match exact path or path with trailing segments (e.g., /admin/gallery/123)
+            // This prevents /admin/galleryimage from matching /admin/gallery
+            const isActive = pathname === entityPath || pathname.startsWith(entityPath + '/')
 
             return (
               <Link

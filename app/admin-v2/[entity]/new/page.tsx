@@ -13,6 +13,21 @@ import { createCategory } from '@/actions/v2/category.actions'
 import { createGallery } from '@/actions/v2/gallery.actions'
 import { createGalleryImage } from '@/actions/v2/galleryImage.actions'
 import { createContactSubmission } from '@/actions/v2/contactSubmission.actions'
+// Running Events Actions
+import { createRegion } from '@/actions/v2/region.actions'
+import { createDistrict } from '@/actions/v2/district.actions'
+import { createLocation } from '@/actions/v2/location.actions'
+import { createOrganizer } from '@/actions/v2/organizer.actions'
+import { createEvent } from '@/actions/v2/event.actions'
+import { createRun } from '@/actions/v2/run.actions'
+import { createRunCategory } from '@/actions/v2/runCategory.actions'
+import { createRunEntryFee } from '@/actions/v2/runEntryFee.actions'
+import { createEventSchedule } from '@/actions/v2/eventSchedule.actions'
+import { createPartner } from '@/actions/v2/partner.actions'
+import { createEventAttachment } from '@/actions/v2/eventAttachment.actions'
+import { createRunner } from '@/actions/v2/runner.actions'
+import { createRegistration } from '@/actions/v2/registration.actions'
+import { createRunResult } from '@/actions/v2/runResult.actions'
 
 // Map entity names to their create actions
 const createActionsMap: Record<string, any> = {
@@ -22,6 +37,21 @@ const createActionsMap: Record<string, any> = {
   gallery: createGallery,
   galleryimage: createGalleryImage,
   contactsubmission: createContactSubmission,
+  // Running Events
+  region: createRegion,
+  district: createDistrict,
+  location: createLocation,
+  organizer: createOrganizer,
+  event: createEvent,
+  run: createRun,
+  runcategory: createRunCategory,
+  runentryfee: createRunEntryFee,
+  eventschedule: createEventSchedule,
+  partner: createPartner,
+  eventattachment: createEventAttachment,
+  runner: createRunner,
+  registration: createRegistration,
+  runresult: createRunResult,
 }
 
 export default function CreateEntityPage({
