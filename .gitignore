@@ -43,3 +43,6 @@ next-env.d.ts
 #database
 database/*
 database_prisma/*
+
+
+/docs/**
