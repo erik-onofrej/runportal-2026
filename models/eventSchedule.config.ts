@@ -14,6 +14,19 @@ export const eventScheduleConfig: ModelConfig = {
   searchFields: ['title', 'description'],
   perPage: 50,
 
+  filters: [
+    {
+      name: 'eventId',
+      type: 'relation-select',
+      label: 'Event',
+      placeholder: 'Filter by event',
+      relation: {
+        model: 'Event',
+        optionsAction: 'getEventOptions',
+      },
+    },
+  ],
+
   fields: [
     {
       name: 'id',

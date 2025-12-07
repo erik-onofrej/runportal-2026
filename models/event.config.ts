@@ -1,5 +1,6 @@
 import { ModelConfig } from '@/lib/admin/types';
 import { Calendar } from 'lucide-react';
+import { EventRunsLinkRenderer, EventScheduleLinkRenderer } from '@/components/admin/custom-list-renderers';
 
 export const eventConfig: ModelConfig = {
   name: 'Event',
@@ -167,6 +168,26 @@ export const eventConfig: ModelConfig = {
         { value: 'cancelled', label: 'Cancelled' },
         { value: 'completed', label: 'Completed' },
       ],
+    },
+    {
+      name: 'runs',
+      type: 'string',
+      label: 'Runs',
+      showInList: true,
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      customListRenderer: EventRunsLinkRenderer,
+    },
+    {
+      name: 'schedule',
+      type: 'string',
+      label: 'Schedule',
+      showInList: true,
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      customListRenderer: EventScheduleLinkRenderer,
     },
     {
       name: 'registrationOpenDate',

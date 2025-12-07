@@ -12,9 +12,9 @@ export const metadata = {
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const page = Number(searchParams.page) || 1;
+  const page = Number((await searchParams).page) || 1;
   const limit = 12;
   const offset = (page - 1) * limit;
 

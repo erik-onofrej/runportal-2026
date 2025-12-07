@@ -12,9 +12,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { FieldRendererProps } from '@/lib/admin/types'
+import { getRelationOptions } from '@/lib/admin-v2/actions/relation-options'
 
 interface RelationOption {
-  id: number
+  value: number | string
   label: string
 }
 
@@ -22,7 +23,7 @@ export function RelationMultiSelect({ field, value, onChange }: FieldRendererPro
   const [options, setOptions] = useState<RelationOption[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  const selectedIds: number[] = Array.isArray(value) ? value : []
+  const selectedIds: (number | string)[] = Array.isArray(value) ? value : []
 
   useEffect(() => {
     if (!field.relation) return
@@ -30,12 +31,14 @@ export function RelationMultiSelect({ field, value, onChange }: FieldRendererPro
     const fetchOptions = async () => {
       try {
         const modelName = field.relation!.model.toLowerCase()
-        const displayField = field.relation!.displayField
-        const response = await fetch(
-          `/api/admin/${modelName}?relation=${field.name}&displayField=${displayField}`
-        )
-        const data = await response.json()
-        setOptions(Array.isArray(data) ? data : [])
+        const result = await getRelationOptions(modelName)
+
+        if (result.success && Array.isArray(result.data)) {
+          setOptions(result.data)
+        } else {
+          console.error('Error fetching relation options:', result.error)
+          setOptions([])
+        }
       } catch (err) {
         console.error('Error fetching relation options:', err)
         setOptions([])
@@ -47,15 +50,15 @@ export function RelationMultiSelect({ field, value, onChange }: FieldRendererPro
     fetchOptions()
   }, [field.relation, field.name])
 
-  const toggleSelection = (optionId: number) => {
-    const newSelection = selectedIds.includes(optionId)
-      ? selectedIds.filter((id) => id !== optionId)
-      : [...selectedIds, optionId]
+  const toggleSelection = (optionValue: number | string) => {
+    const newSelection = selectedIds.includes(optionValue)
+      ? selectedIds.filter((id) => id !== optionValue)
+      : [...selectedIds, optionValue]
     onChange(newSelection)
   }
 
   const selectedLabels = options
-    .filter((opt) => selectedIds.includes(opt.id))
+    .filter((opt) => selectedIds.includes(opt.value))
     .map((opt) => opt.label)
 
   if (isLoading) {
@@ -74,13 +77,13 @@ export function RelationMultiSelect({ field, value, onChange }: FieldRendererPro
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-full" align="start">
           {options.map((option) => {
-            const isSelected = selectedIds.includes(option.id)
+            const isSelected = selectedIds.includes(option.value)
             return (
               <DropdownMenuItem
-                key={option.id}
+                key={option.value}
                 onSelect={(e) => {
                   e.preventDefault()
-                  toggleSelection(option.id)
+                  toggleSelection(option.value)
                 }}
               >
                 <div className="flex items-center gap-2">

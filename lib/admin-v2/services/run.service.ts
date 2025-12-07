@@ -23,6 +23,11 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<Run[]>> {
     ]
   }
 
+  // Handle eventId filter
+  if (search?.filters?.eventId) {
+    where.eventId = search.filters.eventId
+  }
+
   const [data, total] = await Promise.all([
     prisma.run.findMany({
       where,

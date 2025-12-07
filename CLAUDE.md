@@ -70,9 +70,9 @@ Prisma schema location: `prisma/schema.prisma`
 - Route handler: `app/api/auth/[...all]/route.ts` (handles all Better Auth endpoints)
 
 **Middleware Protection:**
-- `/admin` and `/admin-v2`: Requires authenticated user with `role === "admin"`
+- `/admin-v2`: Requires authenticated user with `role === "admin"`
 - `/profile`: Requires authenticated user (any role)
-- `/sign-in` and `/sign-up`: Redirects authenticated users to `/admin`
+- `/sign-in` and `/sign-up`: Redirects authenticated users to `/admin-v2`
 
 ### Database (Prisma + PostgreSQL)
 
@@ -89,9 +89,9 @@ Prisma schema location: `prisma/schema.prisma`
 - `PostCategory`: Join table for Post-Category many-to-many
 - `Session`, `Account`, `Verification`: Better Auth tables
 
-### Admin Generator System (admin-v2)
+### Admin System
 
-**Purpose:** Automates creation of CRUD services and server actions from model configurations.
+**Purpose:** Automated CRUD admin interface with generated services and server actions from model configurations.
 
 **Configuration Files:**
 - `scripts/models-config.js`: Defines models for generation (User, Post, Category)
@@ -109,17 +109,19 @@ Prisma schema location: `prisma/schema.prisma`
 - Located in `scripts/generators/templates/`
 - Placeholders like `[MODEL]`, `[ENTITY]`, `[ID_TYPE]` replaced during generation
 
-**Admin-v2 Routes:**
+**Admin Routes:**
 - `/admin-v2` - Dashboard
 - `/admin-v2/[entity]` - List view (uses DataTable with search, pagination)
 - `/admin-v2/[entity]/new` - Create form
 - `/admin-v2/[entity]/[id]/edit` - Edit form
 
-**How admin-v2 Works:**
+**How Admin Works:**
 - Dynamic routes use entity name from URL (e.g., `/admin-v2/user`)
+- Uses server actions from `actions/v2/` for all CRUD operations
 - Actions mapped in `app/admin-v2/[entity]/page.tsx` via `actionsMap`
 - Model configurations in `models/` directory define UI behavior
 - Config retrieved via `getModelConfig(entity)` from `lib/admin/config.ts`
+- Relation fields use server actions from `lib/admin-v2/actions/relation-options.ts`
 
 ### UI Components (shadcn/ui)
 
@@ -162,20 +164,22 @@ Prisma schema location: `prisma/schema.prisma`
 ```
 app/
 ├── (auth)/          # Auth pages (sign-in, sign-up) with layout
-├── admin/           # Original admin interface
-├── admin-v2/        # Generated admin interface
-│   ├── [entity]/    # Dynamic CRUD routes
+├── admin-v2/        # Admin interface with generated CRUD routes
+│   ├── [entity]/    # Dynamic entity routes (list, new, edit)
 │   ├── layout.tsx
 │   └── page.tsx
 ├── api/
-│   ├── admin/       # Admin API routes
 │   └── auth/        # Better Auth API handler
 ├── profile/         # User profile pages
 └── layout.tsx       # Root layout
 
 lib/
-├── admin/           # Original admin config/types
+├── admin/           # Admin config and types (shared)
+│   ├── config.ts    # Model configuration registry
+│   ├── types.ts     # Type definitions for admin system
+│   └── schema-generator.ts  # Zod schema generation from config
 ├── admin-v2/
+│   ├── actions/     # Action helpers (relation options)
 │   ├── services/    # Generated database services
 │   └── types/       # Service/action type definitions
 ├── auth.ts          # Better Auth server config
@@ -184,8 +188,7 @@ lib/
 └── utils.ts         # Tailwind merge utility
 
 actions/
-├── v2/              # Generated server actions
-└── resources/       # Original resource actions
+└── v2/              # Generated server actions
 
 scripts/
 ├── generators/
@@ -196,8 +199,8 @@ scripts/
 models/              # Admin UI model configurations
 components/
 ├── ui/              # shadcn/ui components
-├── admin/           # Admin components
-└── auth/            # Auth components
+├── admin/           # Admin components (DataTable, forms, etc.)
+└── auth/            # Authentication forms and components
 
 prisma/
 ├── schema.prisma    # Database schema

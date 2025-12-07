@@ -187,7 +187,7 @@ function renderField(
       return (
         <Textarea
           placeholder={fieldConfig.placeholder}
-          value={field.value as string}
+          value={(field.value as string) ?? ''}
           onChange={(e) => field.onChange(e.target.value)}
           rows={5}
         />
@@ -333,7 +333,7 @@ function renderField(
         <Input
           type="number"
           placeholder={fieldConfig.placeholder}
-          value={field.value as number}
+          value={field.value ?? ''}
           onChange={(e) => field.onChange(parseFloat(e.target.value))}
         />
       )
@@ -343,7 +343,7 @@ function renderField(
         <Input
           type="email"
           placeholder={fieldConfig.placeholder}
-          value={field.value as string}
+          value={(field.value as string) ?? ''}
           onChange={(e) => field.onChange(e.target.value)}
         />
       )
@@ -353,7 +353,7 @@ function renderField(
         <Input
           type="text"
           placeholder={fieldConfig.placeholder}
-          value={field.value as string}
+          value={(field.value as string) ?? ''}
           onChange={(e) => field.onChange(e.target.value)}
         />
       )

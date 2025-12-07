@@ -70,7 +70,7 @@ export interface FieldConfig {
 
   // Custom rendering (override defaults)
   customRenderer?: React.ComponentType<FieldRendererProps>
-  customListRenderer?: (value: unknown) => ReactNode
+  customListRenderer?: (value: unknown, row?: Record<string, unknown>) => ReactNode
 
   // Permissions
   readonly?: boolean
@@ -84,6 +84,29 @@ export interface FieldRendererProps {
   value: unknown
   onChange: (value: unknown) => void
   error?: string
+}
+
+// Filter types for list view filtering
+export type FilterType = 'relation-select' | 'select' | 'date-range' | 'boolean'
+
+// Filter configuration for list view
+export interface FilterConfig {
+  name: string                    // Filter identifier (e.g., 'eventId', 'regionId')
+  type: FilterType                // Type of filter component to render
+  label: string                   // Display label for the filter
+  placeholder?: string            // Placeholder text for the filter
+
+  // For relation-select filters
+  relation?: {
+    model: string                 // Related model name (e.g., 'Event', 'Region')
+    optionsAction: string         // Action function name to fetch options (e.g., 'getEventOptions')
+  }
+
+  // For select filters
+  options?: { label: string; value: string | number }[]
+
+  // Field to filter on in the database (if different from name)
+  filterField?: string
 }
 
 // Model configuration
@@ -106,6 +129,7 @@ export interface ModelConfig {
   defaultSort?: { field: string; direction: 'asc' | 'desc' }
   searchFields?: string[]         // Fields to search in
   perPage?: number                // Items per page (default: 10)
+  filters?: FilterConfig[]        // Filters for list view
 
   // Permissions (for future extension)
   permissions?: {

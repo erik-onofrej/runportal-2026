@@ -8,12 +8,14 @@ interface DataTableToolbarProps {
   searchValue: string
   onSearchChange: (value: string) => void
   onClearSearch: () => void
+  children?: React.ReactNode
 }
 
 export function DataTableToolbar({
   searchValue,
   onSearchChange,
   onClearSearch,
+  children,
 }: DataTableToolbarProps) {
   return (
     <div className="flex items-center justify-between">
@@ -24,6 +26,7 @@ export function DataTableToolbar({
           onChange={(e) => onSearchChange(e.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
         />
+        {children}
         {searchValue && (
           <Button
             variant="ghost"

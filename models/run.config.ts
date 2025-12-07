@@ -1,5 +1,6 @@
 import { ModelConfig } from '@/lib/admin/types';
 import { Flag } from 'lucide-react';
+import { RunCategoriesLinkRenderer } from '@/components/admin/custom-list-renderers';
 
 export const runConfig: ModelConfig = {
   name: 'Run',
@@ -13,6 +14,19 @@ export const runConfig: ModelConfig = {
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['name'],
   perPage: 20,
+
+  filters: [
+    {
+      name: 'eventId',
+      type: 'relation-select',
+      label: 'Event',
+      placeholder: 'Filter by event',
+      relation: {
+        model: 'Event',
+        optionsAction: 'getEventOptions',
+      },
+    },
+  ],
 
   fields: [
     {
@@ -106,6 +120,16 @@ export const runConfig: ModelConfig = {
       helpText: 'Display order within event',
       showInList: true,
       sortable: true,
+    },
+    {
+      name: 'categories',
+      type: 'string',
+      label: 'Categories',
+      showInList: true,
+      readonly: true,
+      hideInCreate: true,
+      hideInEdit: true,
+      customListRenderer: RunCategoriesLinkRenderer,
     },
     {
       name: 'createdAt',

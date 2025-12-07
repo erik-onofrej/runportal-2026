@@ -5,8 +5,8 @@ import { headers } from "next/headers"
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Protect admin routes (both v1 and v2)
-  if (pathname.startsWith("/admin-v2") || pathname.startsWith("/admin")) {
+  // Protect admin routes
+  if (pathname.startsWith("/admin-v2")) {
     const session = await auth.api.getSession({
       headers: await headers(),
     })
@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
     })
 
     if (session) {
-      return NextResponse.redirect(new URL("/admin", request.url))
+      return NextResponse.redirect(new URL("/admin-v2", request.url))
     }
   }
 
@@ -48,5 +48,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   runtime: "nodejs",
-  matcher: ["/admin/:path*", "/admin-v2/:path*", "/profile/:path*", "/sign-in", "/sign-up"],
+  matcher: ["/admin-v2/:path*", "/profile/:path*", "/sign-in", "/sign-up"],
 }

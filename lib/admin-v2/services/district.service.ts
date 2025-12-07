@@ -24,6 +24,11 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<District[]>>
     ]
   }
 
+  // Handle regionId filter
+  if (search?.filters?.regionId) {
+    where.regionId = search.filters.regionId
+  }
+
   const [data, total] = await Promise.all([
     prisma.district.findMany({
       where,

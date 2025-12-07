@@ -14,6 +14,19 @@ export const districtConfig: ModelConfig = {
   searchFields: ['name', 'code'],
   perPage: 50,
 
+  filters: [
+    {
+      name: 'regionId',
+      type: 'relation-select',
+      label: 'Region',
+      placeholder: 'Filter by region',
+      relation: {
+        model: 'Region',
+        optionsAction: 'getRegionOptions',
+      },
+    },
+  ],
+
   fields: [
     {
       name: 'id',

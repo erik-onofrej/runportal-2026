@@ -9,9 +9,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { FieldRendererProps } from '@/lib/admin/types'
+import { getRelationOptions } from '@/lib/admin-v2/actions/relation-options'
 
 interface RelationOption {
-  id: number | string
+  value: number | string
   label: string
 }
 
@@ -25,12 +26,14 @@ export function RelationSelect({ field, value, onChange }: FieldRendererProps) {
     const fetchOptions = async () => {
       try {
         const modelName = field.relation!.model.toLowerCase()
-        const displayField = field.relation!.displayField
-        const response = await fetch(
-          `/api/admin/${modelName}?relation=${field.name}&displayField=${displayField}`
-        )
-        const data = await response.json()
-        setOptions(Array.isArray(data) ? data : [])
+        const result = await getRelationOptions(modelName)
+
+        if (result.success && Array.isArray(result.data)) {
+          setOptions(result.data)
+        } else {
+          console.error('Error fetching relation options:', result.error)
+          setOptions([])
+        }
       } catch (err) {
         console.error('Error fetching relation options:', err)
         setOptions([])
@@ -66,7 +69,7 @@ export function RelationSelect({ field, value, onChange }: FieldRendererProps) {
       </SelectTrigger>
       <SelectContent>
         {options.map((option) => (
-          <SelectItem key={option.id} value={String(option.id)}>
+          <SelectItem key={option.value} value={String(option.value)}>
             {option.label}
           </SelectItem>
         ))}

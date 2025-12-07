@@ -1,7 +1,7 @@
 'use client'
 
 import { use, useEffect, useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { getModelConfig } from '@/lib/admin/config'
 import { Button } from '@/components/ui/button'
@@ -34,6 +34,7 @@ import { getAllRegistrations, deleteRegistration } from '@/actions/v2/registrati
 import { getAllRunResults, deleteRunResult } from '@/actions/v2/runResult.actions'
 import type { ServiceParams } from '@/lib/admin-v2/types/service.types'
 import type { ActionResponse } from '@/lib/admin-v2/types/action.types'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // Map entity names to their actions
 const actionsMap: Record<string, {
@@ -68,6 +69,7 @@ export default function EntityListPage({
 }) {
   const { entity } = use(params)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const config = getModelConfig(entity)
 
   const [data, setData] = useState<Record<string, unknown>[]>([])
@@ -76,6 +78,10 @@ export default function EntityListPage({
   const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  // Dynamic filter states
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({})
+  const [filterOptions, setFilterOptions] = useState<Record<string, Array<{ value: number; label: string }>>>({})
+  const [filtersInitialized, setFiltersInitialized] = useState(false)
 
   const debouncedSearch = useDebounce(search, 300)
 
@@ -86,18 +92,91 @@ export default function EntityListPage({
     setData([])
     setPage(1)
     setSearch('')
+    setFilterValues({})
+    setFilterOptions({})
+    setFiltersInitialized(false)
   }, [entity])
 
+  // Initialize filters from query parameters
   useEffect(() => {
-    if (!config || !actions) return
+    if (filtersInitialized) return
+
+    // If no filters configured, mark as initialized immediately
+    if (!config?.filters) {
+      setFiltersInitialized(true)
+      return
+    }
+
+    const initialFilters: Record<string, string> = {}
+    config.filters.forEach((filter) => {
+      const paramValue = searchParams.get(filter.name)
+      if (paramValue) {
+        initialFilters[filter.name] = paramValue
+      }
+    })
+
+    if (Object.keys(initialFilters).length > 0) {
+      setFilterValues(initialFilters)
+    }
+    setFiltersInitialized(true)
+  }, [config, searchParams, filtersInitialized])
+
+  // Load filter options dynamically based on config
+  useEffect(() => {
+    if (!config || !config.filters) return
+    loadFilterOptions()
+  }, [entity, config])
+
+  useEffect(() => {
+    if (!config || !actions || !filtersInitialized) return
     fetchData()
-  }, [config, page, debouncedSearch])
+  }, [config, page, debouncedSearch, filterValues, filtersInitialized])
+
+  const loadFilterOptions = async () => {
+    if (!config?.filters) return
+
+    for (const filter of config.filters) {
+      if (filter.type === 'relation-select' && filter.relation) {
+        try {
+          // Dynamically import and call the options action
+          const optionsAction = await import(`@/actions/v2/${filter.relation.model.toLowerCase()}.actions`).then(
+            (mod) => mod[filter.relation!.optionsAction]
+          )
+
+          const result = await optionsAction()
+          if (result.success && result.data) {
+            setFilterOptions((prev) => ({
+              ...prev,
+              [filter.name]: result.data,
+            }))
+          }
+        } catch (error) {
+          console.error(`Error loading options for filter ${filter.name}:`, error)
+        }
+      }
+    }
+  }
 
   const fetchData = async () => {
     if (!actions) return
 
     setIsLoading(true)
     try {
+      // Build filters dynamically from filterValues
+      const filters: Record<string, any> = {}
+
+      Object.entries(filterValues).forEach(([key, value]) => {
+        if (value && value !== 'all') {
+          // Parse as integer for relation filters
+          const filterConfig = config?.filters?.find(f => f.name === key)
+          if (filterConfig?.type === 'relation-select') {
+            filters[key] = parseInt(value)
+          } else {
+            filters[key] = value
+          }
+        }
+      })
+
       const result = await actions.getAll({
         pagination: {
           page,
@@ -105,6 +184,7 @@ export default function EntityListPage({
         },
         search: {
           query: debouncedSearch,
+          filters: Object.keys(filters).length > 0 ? filters : undefined,
         },
       })
 
@@ -164,13 +244,19 @@ export default function EntityListPage({
 
           // Use custom list renderer if provided
           if (field.customListRenderer) {
-            return field.customListRenderer(value)
+            return field.customListRenderer(value, row.original)
           }
 
           // Handle many-to-one relation
-          if (field.type === 'relation' && value && typeof value === 'object' && field.relation) {
-            const displayValue = (value as Record<string, unknown>)[field.relation.displayField]
-            return String(displayValue || '-')
+          if (field.type === 'relation' && field.relation) {
+            // Access the relation by model name (e.g., 'region') not the foreign key (e.g., 'regionId')
+            const relatedModelName = field.relation.model.charAt(0).toLowerCase() + field.relation.model.slice(1)
+            const relatedObject = row.original[relatedModelName] as Record<string, unknown> | undefined
+            if (relatedObject) {
+              const displayValue = relatedObject[field.relation.displayField]
+              return String(displayValue || '-')
+            }
+            return '-'
           }
 
           // Handle many-to-many relation
@@ -249,9 +335,39 @@ export default function EntityListPage({
         onSearchChange={setSearch}
         onClearSearch={() => {
           setSearch('')
+          setFilterValues({})
           setPage(1)
         }}
-      />
+      >
+        {config.filters?.map((filter) => {
+          if (filter.type === 'relation-select') {
+            const options = filterOptions[filter.name] || []
+            return (
+              <Select
+                key={filter.name}
+                value={filterValues[filter.name] || 'all'}
+                onValueChange={(value) => {
+                  setFilterValues((prev) => ({ ...prev, [filter.name]: value }))
+                  setPage(1)
+                }}
+              >
+                <SelectTrigger size="sm" className="h-8 w-auto min-w-[180px] max-w-[400px]">
+                  <SelectValue placeholder={filter.placeholder || filter.label} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All {filter.relation?.model}s</SelectItem>
+                  {options.map((option) => (
+                    <SelectItem key={option.value} value={option.value.toString()}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )
+          }
+          return null
+        })}
+      </DataTableToolbar>
 
       {isLoading ? (
         <div>Loading...</div>

@@ -22,7 +22,7 @@ import { runResultConfig } from '@/models/runResult.config'
 // Central registry of all admin models
 export const adminConfig: AdminConfig = {
   title: 'Admin Panel',
-  basePath: '/admin',
+  basePath: '/admin-v2',
   models: [
     userConfig,
     blogConfig,

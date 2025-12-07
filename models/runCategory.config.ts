@@ -14,6 +14,19 @@ export const runCategoryConfig: ModelConfig = {
   searchFields: ['name', 'code'],
   perPage: 50,
 
+  filters: [
+    {
+      name: 'runId',
+      type: 'relation-select',
+      label: 'Run',
+      placeholder: 'Filter by run',
+      relation: {
+        model: 'Run',
+        optionsAction: 'getRunOptions',
+      },
+    },
+  ],
+
   fields: [
     {
       name: 'id',
