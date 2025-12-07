@@ -13,6 +13,20 @@ export function AdminV2Sidebar() {
   const models = getAllModelConfigs()
   const { data: session, isPending } = useSession()
 
+  // Group models by their group property
+  const groupedModels = models.reduce((acc, model) => {
+    const group = model.group || 'Other'
+    if (!acc[group]) {
+      acc[group] = []
+    }
+    acc[group].push(model)
+    return acc
+  }, {} as Record<string, typeof models>)
+
+  // Define group order
+  const groupOrder = ['System', 'Content', 'Locations', 'Events', 'Runs', 'Participants', 'Other']
+  const sortedGroups = groupOrder.filter(group => groupedModels[group])
+
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-card">
       <div className="flex h-full flex-col">
@@ -37,30 +51,39 @@ export function AdminV2Sidebar() {
             <span>Dashboard</span>
           </Link>
 
-          {/* Model links */}
-          {models.map((model) => {
-            const Icon = model.icon
-            const entityPath = `/admin-v2/${model.name.toLowerCase()}`
-            // Match exact path or path with trailing segments (e.g., /admin-v2/gallery/123)
-            // This prevents /admin-v2/galleryimage from matching /admin-v2/gallery
-            const isActive = pathname === entityPath || pathname.startsWith(entityPath + '/')
+          {/* Grouped Model links */}
+          {sortedGroups.map((groupName, groupIndex) => (
+            <div key={groupName} className={cn(groupIndex > 0 && 'mt-6')}>
+              <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {groupName}
+              </h3>
+              <div className="space-y-1">
+                {groupedModels[groupName].map((model) => {
+                  const Icon = model.icon
+                  const entityPath = `/admin-v2/${model.name.toLowerCase()}`
+                  // Match exact path or path with trailing segments (e.g., /admin-v2/gallery/123)
+                  // This prevents /admin-v2/galleryimage from matching /admin-v2/gallery
+                  const isActive = pathname === entityPath || pathname.startsWith(entityPath + '/')
 
-            return (
-              <Link
-                key={model.name}
-                href={entityPath}
-                className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                )}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{model.namePlural}</span>
-              </Link>
-            )
-          })}
+                  return (
+                    <Link
+                      key={model.name}
+                      href={entityPath}
+                      className={cn(
+                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{model.namePlural}</span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* Footer */}

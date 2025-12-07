@@ -31,11 +31,6 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<Event[]>> {
       include: {
       location: true,
       organizer: true,
-      galleries: {
-        include: {
-          gallery: true,
-        },
-      },
       },
       orderBy: orderBy || {'startDate':'desc'},
       skip,
@@ -61,71 +56,31 @@ async function get(id: number): Promise<Event | null> {
       include: {
       location: true,
       organizer: true,
-      galleries: {
-        include: {
-          gallery: true,
-        },
-      },
       },
   })
 }
 
 async function create(data: Prisma.EventCreateInput): Promise<Event> {
-  const { galleries, ...restData } = data
-
   return prisma.event.create({
     data: {
-      ...restData,
-      galleries: Array.isArray(galleries)
-        ? {
-            create: (galleries as number[]).map((galleryId: number) => ({
-              galleryId: galleryId,
-            })),
-          }
-        : undefined,
+      ...data,
     },
       include: {
       location: true,
       organizer: true,
-      galleries: {
-        include: {
-          gallery: true,
-        },
-      },
       },
   })
 }
 
 async function update(id: number, data: Prisma.EventUpdateInput): Promise<Event> {
-  const { galleries, ...restData } = data
-
-  if (galleries !== undefined) {
-    await prisma.eventGallery.deleteMany({
-      where: { eventId: id },
-    })
-  }
-
-
   return prisma.event.update({
     where: { id },
     data: {
-      ...restData,
-      galleries: Array.isArray(galleries)
-        ? {
-            create: (galleries as number[]).map((galleryId: number) => ({
-              galleryId: galleryId,
-            })),
-          }
-        : undefined,
+      ...data,
     },
       include: {
       location: true,
       organizer: true,
-      galleries: {
-        include: {
-          gallery: true,
-        },
-      },
       },
   })
 }

@@ -8,6 +8,7 @@ export const userConfig: ModelConfig = {
   icon: User,
   description: 'Manage system users',
   primaryField: 'name',
+  group: 'System',
 
   defaultSort: { field: 'createdAt', direction: 'desc' },
   searchFields: ['name', 'email'],

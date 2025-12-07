@@ -8,6 +8,7 @@ export const districtConfig: ModelConfig = {
   icon: MapPin,
   description: 'Manage Slovak districts (okresy)',
   primaryField: 'name',
+  group: 'Locations',
 
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['name', 'code'],

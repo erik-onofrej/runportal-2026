@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate:admin-v2": "node scripts/generators/generate-all.js"
+    "generate:admin-v2": "node scripts/generators/generate-all.js",
+    "db:seed": "npx tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@better-auth/cli": "^1.4.3",

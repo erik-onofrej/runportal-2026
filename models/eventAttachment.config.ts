@@ -8,6 +8,7 @@ export const eventAttachmentConfig: ModelConfig = {
   icon: Paperclip,
   description: 'Manage event files and attachments',
   primaryField: 'title',
+  group: 'Events',
 
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['title', 'description'],

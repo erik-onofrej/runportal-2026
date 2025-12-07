@@ -16,8 +16,6 @@ import { useDebounce } from '@/hooks/use-debounce'
 import { getAllUsers, deleteUser } from '@/actions/v2/user.actions'
 import { getAllBlogs, deleteBlog } from '@/actions/v2/blog.actions'
 import { getAllCategories, deleteCategory } from '@/actions/v2/category.actions'
-import { getAllGalleries, deleteGallery } from '@/actions/v2/gallery.actions'
-import { getAllGalleryImages, deleteGalleryImage } from '@/actions/v2/galleryImage.actions'
 import { getAllContactSubmissions, deleteContactSubmission } from '@/actions/v2/contactSubmission.actions'
 // Running Events Actions
 import { getAllRegions, deleteRegion } from '@/actions/v2/region.actions'
@@ -45,8 +43,6 @@ const actionsMap: Record<string, {
   user: { getAll: getAllUsers, delete: deleteUser as (ids: (number | string)[]) => Promise<ActionResponse> },
   blog: { getAll: getAllBlogs, delete: deleteBlog as (ids: (number | string)[]) => Promise<ActionResponse> },
   category: { getAll: getAllCategories, delete: deleteCategory as (ids: (number | string)[]) => Promise<ActionResponse> },
-  gallery: { getAll: getAllGalleries, delete: deleteGallery as (ids: (number | string)[]) => Promise<ActionResponse> },
-  galleryimage: { getAll: getAllGalleryImages, delete: deleteGalleryImage as (ids: (number | string)[]) => Promise<ActionResponse> },
   contactsubmission: { getAll: getAllContactSubmissions, delete: deleteContactSubmission as (ids: (number | string)[]) => Promise<ActionResponse> },
   // Running Events
   region: { getAll: getAllRegions, delete: deleteRegion as (ids: (number | string)[]) => Promise<ActionResponse> },

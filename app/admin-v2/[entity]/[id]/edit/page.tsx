@@ -10,8 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { getUser, updateUser } from '@/actions/v2/user.actions'
 import { getBlog, updateBlog } from '@/actions/v2/blog.actions'
 import { getCategory, updateCategory } from '@/actions/v2/category.actions'
-import { getGallery, updateGallery } from '@/actions/v2/gallery.actions'
-import { getGalleryImage, updateGalleryImage } from '@/actions/v2/galleryImage.actions'
 import { getContactSubmission, updateContactSubmission } from '@/actions/v2/contactSubmission.actions'
 // Running Events Actions
 import { getRegion, updateRegion } from '@/actions/v2/region.actions'
@@ -34,8 +32,6 @@ const actionsMap: Record<string, any> = {
   user: { get: getUser, update: updateUser },
   blog: { get: getBlog, update: updateBlog },
   category: { get: getCategory, update: updateCategory },
-  gallery: { get: getGallery, update: updateGallery },
-  galleryimage: { get: getGalleryImage, update: updateGalleryImage },
   contactsubmission: { get: getContactSubmission, update: updateContactSubmission },
   // Running Events
   region: { get: getRegion, update: updateRegion },

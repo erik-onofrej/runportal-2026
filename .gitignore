@@ -43,6 +43,10 @@ next-env.d.ts
 #database
 database/*
 database_prisma/*
-
+# But keep template and scripts for docker-compose
+!database/.env.example
+!database/docker-compose.template.yaml
+!database/generate-docker-compose.js
+!database/README.md
 
 /docs/**

@@ -126,43 +126,6 @@ model Verification {
   @@index([identifier])
 }
 
-// Gallery Model
-
-model Gallery {
-  id          Int            @id @default(autoincrement())
-  title       String
-  slug        String         @unique
-  description String?        @db.Text
-  coverImage  String?
-  status      String         @default("draft")
-  sortOrder   Int            @default(0)
-  publishedAt DateTime?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-
-  // Relations
-  images         GalleryImage[]
-  eventGalleries EventGallery[]
-}
-
-// Gallery Image Model
-
-model GalleryImage {
-  id          Int      @id @default(autoincrement())
-  galleryId   Int
-  imageUrl    String
-  title       String?
-  description String?  @db.Text
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-
-  @@index([galleryId])
-}
-
 // Contact Submission Model
 
 model ContactSubmission {
@@ -291,7 +254,6 @@ model Event {
   schedule    EventSchedule[]
   partners    EventPartner[]
   attachments EventAttachment[]
-  galleries   EventGallery[]
 
   @@index([slug])
   @@index([status])
@@ -437,21 +399,6 @@ model EventAttachment {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
-}
-
-// EventGallery (link to existing Gallery model)
-
-model EventGallery {
-  eventId   Int
-  galleryId Int
-  sortOrder Int @default(0)
-
-  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-
-  @@id([eventId, galleryId])
-  @@index([eventId])
-  @@index([galleryId])
 }
 
 // Runner (guest-first, optional accounts)

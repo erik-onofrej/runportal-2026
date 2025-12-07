@@ -8,6 +8,7 @@ export const locationConfig: ModelConfig = {
   icon: MapPin,
   description: 'Manage event locations',
   primaryField: 'name',
+  group: 'Locations',
 
   defaultSort: { field: 'name', direction: 'asc' },
   searchFields: ['name', 'city', 'street'],

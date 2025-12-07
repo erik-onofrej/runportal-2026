@@ -8,6 +8,7 @@ export const runConfig: ModelConfig = {
   icon: Flag,
   description: 'Manage individual races within events',
   primaryField: 'name',
+  group: 'Runs',
 
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['name'],

@@ -2,8 +2,6 @@ import { ModelConfig, AdminConfig } from './types'
 import { userConfig } from '@/models/user.config'
 import { blogConfig } from '@/models/blog.config'
 import { categoryConfig } from '@/models/category.config'
-import { galleryConfig } from '@/models/gallery.config'
-import { galleryImageConfig } from '@/models/galleryImage.config'
 import { contactSubmissionConfig } from '@/models/contactSubmission.config'
 // Running Events Models
 import { regionConfig } from '@/models/region.config'
@@ -29,8 +27,6 @@ export const adminConfig: AdminConfig = {
     userConfig,
     blogConfig,
     categoryConfig,
-    galleryConfig,
-    galleryImageConfig,
     contactSubmissionConfig,
     // Running Events
     regionConfig,

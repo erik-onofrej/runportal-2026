@@ -8,6 +8,7 @@ export const organizerConfig: ModelConfig = {
   icon: Users,
   description: 'Manage event organizers',
   primaryField: 'name',
+  group: 'Events',
 
   defaultSort: { field: 'name', direction: 'asc' },
   searchFields: ['name', 'email'],

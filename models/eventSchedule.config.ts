@@ -8,6 +8,7 @@ export const eventScheduleConfig: ModelConfig = {
   icon: Clock,
   description: 'Manage event schedule and activities',
   primaryField: 'title',
+  group: 'Events',
 
   defaultSort: { field: 'startTime', direction: 'asc' },
   searchFields: ['title', 'description'],

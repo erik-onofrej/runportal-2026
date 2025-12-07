@@ -8,6 +8,7 @@ export const blogConfig: ModelConfig = {
   icon: FileText,
   description: 'Manage blog posts',
   primaryField: 'title',
+  group: 'Content',
 
   defaultSort: { field: 'createdAt', direction: 'desc' },
   searchFields: ['title', 'slug', 'content'],

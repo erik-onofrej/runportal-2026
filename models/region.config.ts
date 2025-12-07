@@ -8,6 +8,7 @@ export const regionConfig: ModelConfig = {
   icon: MapPin,
   description: 'Manage Slovak regions (kraje)',
   primaryField: 'name',
+  group: 'Locations',
 
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['name', 'code'],

@@ -8,6 +8,7 @@ export const categoryConfig: ModelConfig = {
   icon: FolderOpen,
   description: 'Manage content categories',
   primaryField: 'name',
+  group: 'Content',
 
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['name', 'description'],

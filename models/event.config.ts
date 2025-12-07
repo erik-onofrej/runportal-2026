@@ -8,6 +8,7 @@ export const eventConfig: ModelConfig = {
   icon: Calendar,
   description: 'Manage running events',
   primaryField: 'title',
+  group: 'Events',
 
   defaultSort: { field: 'startDate', direction: 'desc' },
   searchFields: ['title', 'slug', 'description'],
@@ -197,20 +198,6 @@ export const eventConfig: ModelConfig = {
       max: 5000,
       helpText: 'Competition rules and requirements',
       showInList: false,
-    },
-    {
-      name: 'galleries',
-      type: 'relation-many',
-      label: 'Galleries',
-      showInList: false,
-      relation: {
-        model: 'Gallery',
-        displayField: 'title',
-        joinTable: 'eventGallery',
-        localKey: 'eventId',
-        foreignKeyRef: 'galleryId',
-        idType: 'number',
-      },
     },
     {
       name: 'createdAt',

@@ -115,22 +115,6 @@ async function getEventBySlug(slug: string): Promise<Event | null> {
           sortOrder: 'asc',
         },
       },
-      galleries: {
-        include: {
-          gallery: {
-            include: {
-              images: {
-                orderBy: {
-                  sortOrder: 'asc',
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          sortOrder: 'asc',
-        },
-      },
     },
   });
 }

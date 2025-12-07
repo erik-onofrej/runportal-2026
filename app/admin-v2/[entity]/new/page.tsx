@@ -10,8 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { createUser } from '@/actions/v2/user.actions'
 import { createBlog } from '@/actions/v2/blog.actions'
 import { createCategory } from '@/actions/v2/category.actions'
-import { createGallery } from '@/actions/v2/gallery.actions'
-import { createGalleryImage } from '@/actions/v2/galleryImage.actions'
 import { createContactSubmission } from '@/actions/v2/contactSubmission.actions'
 // Running Events Actions
 import { createRegion } from '@/actions/v2/region.actions'
@@ -34,8 +32,6 @@ const createActionsMap: Record<string, any> = {
   user: createUser,
   blog: createBlog,
   category: createCategory,
-  gallery: createGallery,
-  galleryimage: createGalleryImage,
   contactsubmission: createContactSubmission,
   // Running Events
   region: createRegion,

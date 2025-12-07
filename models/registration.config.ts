@@ -8,6 +8,7 @@ export const registrationConfig: ModelConfig = {
   icon: UserPlus,
   description: 'Manage race registrations',
   primaryField: 'registrationNumber',
+  group: 'Participants',
 
   defaultSort: { field: 'registeredAt', direction: 'desc' },
   searchFields: ['registrationNumber', 'guestFirstName', 'guestLastName', 'guestEmail'],

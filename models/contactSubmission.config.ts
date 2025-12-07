@@ -8,6 +8,7 @@ export const contactSubmissionConfig: ModelConfig = {
   icon: Mail,
   description: 'View contact form submissions',
   primaryField: 'name',
+  group: 'Content',
 
   defaultSort: { field: 'createdAt', direction: 'desc' },
   searchFields: ['name', 'email', 'message'],

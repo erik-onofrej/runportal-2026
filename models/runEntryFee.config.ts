@@ -8,6 +8,7 @@ export const runEntryFeeConfig: ModelConfig = {
   icon: Euro,
   description: 'Manage entry fee pricing tiers',
   primaryField: 'name',
+  group: 'Runs',
 
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['name'],

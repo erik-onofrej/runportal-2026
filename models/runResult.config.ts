@@ -8,6 +8,7 @@ export const runResultConfig: ModelConfig = {
   icon: Trophy,
   description: 'Manage race results',
   primaryField: 'id',
+  group: 'Participants',
 
   defaultSort: { field: 'overallPlace', direction: 'asc' },
   searchFields: [],

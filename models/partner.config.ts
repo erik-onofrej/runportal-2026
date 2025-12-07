@@ -8,6 +8,7 @@ export const partnerConfig: ModelConfig = {
   icon: Handshake,
   description: 'Manage event partners and sponsors',
   primaryField: 'name',
+  group: 'Events',
 
   defaultSort: { field: 'name', direction: 'asc' },
   searchFields: ['name', 'description'],

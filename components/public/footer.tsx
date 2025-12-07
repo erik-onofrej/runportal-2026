@@ -8,7 +8,7 @@ export function Footer() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Starter Blog</h3>
             <p className="text-sm text-muted-foreground">
-              A modern blog and gallery platform built with Next.js 16.
+              A modern blog platform built with Next.js 16.
             </p>
           </div>
 
@@ -18,11 +18,6 @@ export function Footer() {
               <li>
                 <Link href="/blog" className="text-muted-foreground hover:text-primary">
                   Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/galleries" className="text-muted-foreground hover:text-primary">
-                  Galleries
                 </Link>
               </li>
               <li>

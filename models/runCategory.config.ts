@@ -8,6 +8,7 @@ export const runCategoryConfig: ModelConfig = {
   icon: Users,
   description: 'Manage age/gender categories for runs',
   primaryField: 'name',
+  group: 'Runs',
 
   defaultSort: { field: 'sortOrder', direction: 'asc' },
   searchFields: ['name', 'code'],

@@ -97,6 +97,7 @@ export interface ModelConfig {
   icon: LucideIcon
   description?: string
   primaryField: string            // Field to use as display label
+  group?: string                  // Menu group category
 
   // Fields
   fields: FieldConfig[]

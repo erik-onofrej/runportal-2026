@@ -8,6 +8,7 @@ export const runnerConfig: ModelConfig = {
   icon: User,
   description: 'Manage runner profiles',
   primaryField: 'firstName',
+  group: 'Participants',
 
   defaultSort: { field: 'createdAt', direction: 'desc' },
   searchFields: ['firstName', 'lastName', 'email', 'club'],
