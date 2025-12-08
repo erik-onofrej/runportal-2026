@@ -61,6 +61,7 @@ async function get(id: number): Promise<Event | null> {
 }
 
 async function create(data: Prisma.EventCreateInput): Promise<Event> {
+
   return prisma.event.create({
     data: {
       ...data,
@@ -73,6 +74,8 @@ async function create(data: Prisma.EventCreateInput): Promise<Event> {
 }
 
 async function update(id: number, data: Prisma.EventUpdateInput): Promise<Event> {
+
+
   return prisma.event.update({
     where: { id },
     data: {

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 export function EventRunsLinkRenderer(value: unknown, row?: Record<string, unknown>) {
   const eventId = row?.id
@@ -31,17 +32,27 @@ export function EventScheduleLinkRenderer(value: unknown, row?: Record<string, u
   )
 }
 
-export function RunCategoriesLinkRenderer(value: unknown, row?: Record<string, unknown>) {
-  const runId = row?.id
-  if (!runId) return '-'
+export function RunCategoriesRenderer(value: unknown, row?: Record<string, unknown>) {
+  const categories = row?.categories as Array<{ category: { name: string; code: string } }> | undefined
+
+  if (!categories || categories.length === 0) {
+    return <span className="text-muted-foreground text-sm">No categories</span>
+  }
+
+  // Show first 3 categories as badges, then a count if there are more
+  const displayCategories = categories.slice(0, 3)
+  const remainingCount = categories.length - 3
 
   return (
-    <Link
-      href={`/admin-v2/runcategory?runId=${runId}`}
-      className="flex items-center gap-1 text-primary hover:underline"
-    >
-      View Categories
-      <ArrowRight className="h-3 w-3" />
-    </Link>
+    <div className="flex flex-wrap gap-1 items-center">
+      {displayCategories.map((cat, index) => (
+        <Badge key={index} variant="secondary" className="text-xs">
+          {cat.category.code}
+        </Badge>
+      ))}
+      {remainingCount > 0 && (
+        <span className="text-xs text-muted-foreground">+{remainingCount} more</span>
+      )}
+    </div>
   )
 }

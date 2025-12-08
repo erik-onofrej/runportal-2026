@@ -23,16 +23,16 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<Run[]>> {
     ]
   }
 
-  // Handle eventId filter
-  if (search?.filters?.eventId) {
-    where.eventId = search.filters.eventId
-  }
-
   const [data, total] = await Promise.all([
     prisma.run.findMany({
       where,
       include: {
       event: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
       },
       orderBy: orderBy || {'sortOrder':'asc'},
       skip,
@@ -57,32 +57,69 @@ async function get(id: number): Promise<Run | null> {
     where: { id },
       include: {
       event: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
       },
   })
 }
 
 async function create(data: Prisma.RunCreateInput): Promise<Run> {
+  const { categories, ...restData } = data
 
   return prisma.run.create({
     data: {
-      ...data,
+      ...restData,
+      categories: Array.isArray(categories)
+        ? {
+            create: (categories as number[]).map((runCategoryId: number) => ({
+              categoryId: runCategoryId,
+            })),
+          }
+        : undefined,
     },
       include: {
       event: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
       },
   })
 }
 
 async function update(id: number, data: Prisma.RunUpdateInput): Promise<Run> {
+  const { categories, ...restData } = data
+
+  if (categories !== undefined) {
+    await prisma.runCategoryAssignment.deleteMany({
+      where: { runId: id },
+    })
+  }
 
 
   return prisma.run.update({
     where: { id },
     data: {
-      ...data,
+      ...restData,
+      categories: Array.isArray(categories)
+        ? {
+            create: (categories as number[]).map((runCategoryId: number) => ({
+              categoryId: runCategoryId,
+            })),
+          }
+        : undefined,
     },
       include: {
       event: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
       },
   })
 }

@@ -14,18 +14,7 @@ export const runCategoryConfig: ModelConfig = {
   searchFields: ['name', 'code'],
   perPage: 50,
 
-  filters: [
-    {
-      name: 'runId',
-      type: 'relation-select',
-      label: 'Run',
-      placeholder: 'Filter by run',
-      relation: {
-        model: 'Run',
-        optionsAction: 'getRunOptions',
-      },
-    },
-  ],
+  filters: [],
 
   fields: [
     {
@@ -36,20 +25,6 @@ export const runCategoryConfig: ModelConfig = {
       hideInCreate: true,
       hideInEdit: true,
       showInList: true,
-    },
-    {
-      name: 'runId',
-      type: 'relation',
-      label: 'Run',
-      required: true,
-      showInList: true,
-      sortable: true,
-      relation: {
-        model: 'Run',
-        displayField: 'name',
-        foreignKey: 'runId',
-        idType: 'number',
-      },
     },
     {
       name: 'name',
@@ -96,10 +71,10 @@ export const runCategoryConfig: ModelConfig = {
       name: 'gender',
       type: 'select',
       label: 'Gender',
-      helpText: 'Leave blank for open/mixed categories',
+      helpText: 'Select gender or leave as open/mixed',
       showInList: true,
       options: [
-        { value: '', label: 'Open/Mixed' },
+        { value: 'mixed', label: 'Open/Mixed' },
         { value: 'male', label: 'Male' },
         { value: 'female', label: 'Female' },
       ],
@@ -112,6 +87,19 @@ export const runCategoryConfig: ModelConfig = {
       helpText: 'Display order',
       showInList: true,
       sortable: true,
+    },
+    {
+      name: 'runs',
+      type: 'relation-many',
+      label: 'Assigned Runs',
+      showInList: false,
+      relation: {
+        model: 'Run',
+        displayField: 'name',
+        joinTable: 'RunCategoryAssignment',
+        localKey: 'categoryId',
+        foreignKeyRef: 'runId',
+      },
     },
     {
       name: 'createdAt',

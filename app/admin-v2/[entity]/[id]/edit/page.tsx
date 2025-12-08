@@ -69,6 +69,25 @@ export default function EditEntityPage({
     fetchData()
   }, [config])
 
+  const transformDataForForm = (rawData: any) => {
+    const transformed = { ...rawData }
+
+    // Transform relation-many fields to extract just the IDs
+    config?.fields.forEach(field => {
+      if (field.type === 'relation-many' && field.relation && rawData[field.name]) {
+        const relationData = rawData[field.name]
+        if (Array.isArray(relationData)) {
+          // Extract IDs from join table
+          // The foreignKeyRef is the field in the join table that points to the related entity
+          const foreignKey = field.relation.foreignKeyRef || 'id'
+          transformed[field.name] = relationData.map((item: any) => item[foreignKey])
+        }
+      }
+    })
+
+    return transformed
+  }
+
   const fetchData = async () => {
     if (!actions) return
 
@@ -81,7 +100,8 @@ export default function EditEntityPage({
       const result = await actions.get(parsedId)
 
       if (result.success && result.data) {
-        setData(result.data)
+        const transformedData = transformDataForForm(result.data)
+        setData(transformedData)
       } else {
         console.error('Error fetching data:', result.error)
         alert(result.error || 'Failed to load data')

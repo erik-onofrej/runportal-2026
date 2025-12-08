@@ -242,51 +242,53 @@ async function seedSampleEvents() {
     },
   });
 
-  // Create standard categories for each run
-  const standardCategories = [
-    { name: 'Men Open', code: 'MO', gender: 'male', minAge: 18, maxAge: null },
-    { name: 'Women Open', code: 'WO', gender: 'female', minAge: 18, maxAge: null },
-    { name: 'Men 40-49', code: 'M40', gender: 'male', minAge: 40, maxAge: 49 },
-    { name: 'Women 40-49', code: 'W40', gender: 'female', minAge: 40, maxAge: 49 },
-    { name: 'Men 50+', code: 'M50', gender: 'male', minAge: 50, maxAge: null },
-    { name: 'Women 50+', code: 'W50', gender: 'female', minAge: 50, maxAge: null },
+  // Create global categories (many-to-many with runs)
+  const categoryDefinitions = [
+    { name: 'Men Open', code: 'MO', gender: 'male', minAge: 18, maxAge: null, sortOrder: 1 },
+    { name: 'Women Open', code: 'WO', gender: 'female', minAge: 18, maxAge: null, sortOrder: 2 },
+    { name: 'Men 40-49', code: 'M40', gender: 'male', minAge: 40, maxAge: 49, sortOrder: 3 },
+    { name: 'Women 40-49', code: 'W40', gender: 'female', minAge: 40, maxAge: 49, sortOrder: 4 },
+    { name: 'Men 50+', code: 'M50', gender: 'male', minAge: 50, maxAge: null, sortOrder: 5 },
+    { name: 'Women 50+', code: 'W50', gender: 'female', minAge: 50, maxAge: null, sortOrder: 6 },
+    { name: 'Juniors 16-18', code: 'J16', gender: 'mixed', minAge: 16, maxAge: 18, sortOrder: 7 },
   ];
 
-  const juniorCategories = [
-    { name: 'Juniors 16-18', code: 'J16', gender: null, minAge: 16, maxAge: 18 },
-  ];
+  // Create all categories once (global)
+  const createdCategories: Record<string, any> = {};
+  for (const cat of categoryDefinitions) {
+    const category = await prisma.runCategory.create({
+      data: {
+        name: cat.name,
+        code: cat.code,
+        gender: cat.gender,
+        minAge: cat.minAge,
+        maxAge: cat.maxAge,
+        sortOrder: cat.sortOrder,
+      },
+    });
+    createdCategories[cat.code] = category;
+  }
 
-  // Add categories to marathon runs
+  // Assign standard categories (excluding juniors) to marathon runs
+  const standardCategoryCodes = ['MO', 'WO', 'M40', 'W40', 'M50', 'W50'];
   for (const run of [fullMarathon, halfMarathon, run10k]) {
-    let order = 1;
-    for (const cat of standardCategories) {
-      await prisma.runCategory.create({
+    for (const code of standardCategoryCodes) {
+      await prisma.runCategoryAssignment.create({
         data: {
           runId: run.id,
-          name: cat.name,
-          code: cat.code,
-          gender: cat.gender,
-          minAge: cat.minAge,
-          maxAge: cat.maxAge,
-          sortOrder: order++,
+          categoryId: createdCategories[code].id,
         },
       });
     }
   }
 
-  // Add categories to park runs (including juniors)
+  // Assign all categories (including juniors) to park runs
   for (const run of [parkRun5k, parkRun10k]) {
-    let order = 1;
-    for (const cat of [...standardCategories, ...juniorCategories]) {
-      await prisma.runCategory.create({
+    for (const code of Object.keys(createdCategories)) {
+      await prisma.runCategoryAssignment.create({
         data: {
           runId: run.id,
-          name: cat.name,
-          code: cat.code,
-          gender: cat.gender,
-          minAge: cat.minAge,
-          maxAge: cat.maxAge,
-          sortOrder: order++,
+          categoryId: createdCategories[code].id,
         },
       });
     }
@@ -460,13 +462,13 @@ async function seedSampleEvents() {
     },
   });
 
-  // Get categories
+  // Get categories by code
   const menOpenCategory = await prisma.runCategory.findFirst({
-    where: { runId: fullMarathon.id, code: 'MO' },
+    where: { code: 'MO' },
   });
 
   const womenOpenCategory = await prisma.runCategory.findFirst({
-    where: { runId: halfMarathon.id, code: 'WO' },
+    where: { code: 'WO' },
   });
 
   if (menOpenCategory && womenOpenCategory) {
@@ -518,7 +520,7 @@ async function seedSampleEvents() {
       data: {
         runId: run10k.id,
         categoryId: await prisma.runCategory
-          .findFirst({ where: { runId: run10k.id, code: 'MO' } })
+          .findFirst({ where: { code: 'MO' } })
           .then((c) => c!.id),
         runnerId: null,
         guestFirstName: 'Peter',

@@ -28,7 +28,11 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<RunCategory[
     prisma.runCategory.findMany({
       where,
       include: {
-      run: true,
+      runs: {
+        include: {
+          run: true,
+        },
+      },
       },
       orderBy: orderBy || {'sortOrder':'asc'},
       skip,
@@ -52,33 +56,67 @@ async function get(id: number): Promise<RunCategory | null> {
   return prisma.runCategory.findUnique({
     where: { id },
       include: {
-      run: true,
+      runs: {
+        include: {
+          run: true,
+        },
+      },
       },
   })
 }
 
 async function create(data: Prisma.RunCategoryCreateInput): Promise<RunCategory> {
+  const { runs, ...restData } = data
 
   return prisma.runCategory.create({
     data: {
-      ...data,
+      ...restData,
+      runs: Array.isArray(runs)
+        ? {
+            create: (runs as number[]).map((runId: number) => ({
+              runId: runId,
+            })),
+          }
+        : undefined,
     },
       include: {
-      run: true,
+      runs: {
+        include: {
+          run: true,
+        },
+      },
       },
   })
 }
 
 async function update(id: number, data: Prisma.RunCategoryUpdateInput): Promise<RunCategory> {
+  const { runs, ...restData } = data
+
+  if (runs !== undefined) {
+    await prisma.runCategoryAssignment.deleteMany({
+      where: { categoryId: id },
+    })
+  }
 
 
   return prisma.runCategory.update({
     where: { id },
     data: {
-      ...data,
+      ...restData,
+      runs: Array.isArray(runs)
+        ? {
+            create: (runs as number[]).map((runId: number) => ({
+              runId: runId,
+            })),
+          }
+        : undefined,
     },
       include: {
-      run: true,
+      runs: {
+        include: {
+          run: true,
+        },
+      },
       },
   })
 }

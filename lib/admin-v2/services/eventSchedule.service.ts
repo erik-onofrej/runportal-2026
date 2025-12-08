@@ -24,11 +24,6 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<EventSchedul
     ]
   }
 
-  // Handle eventId filter
-  if (search?.filters?.eventId) {
-    where.eventId = search.filters.eventId
-  }
-
   const [data, total] = await Promise.all([
     prisma.eventSchedule.findMany({
       where,

@@ -1,6 +1,6 @@
 import { ModelConfig } from '@/lib/admin/types';
 import { Flag } from 'lucide-react';
-import { RunCategoriesLinkRenderer } from '@/components/admin/custom-list-renderers';
+import { RunCategoriesRenderer } from '@/components/admin/custom-list-renderers';
 
 export const runConfig: ModelConfig = {
   name: 'Run',
@@ -97,7 +97,7 @@ export const runConfig: ModelConfig = {
     },
     {
       name: 'startTime',
-      type: 'date',
+      type: 'datetime',
       label: 'Start Time',
       required: true,
       helpText: 'When this race starts',
@@ -123,13 +123,17 @@ export const runConfig: ModelConfig = {
     },
     {
       name: 'categories',
-      type: 'string',
+      type: 'relation-many',
       label: 'Categories',
       showInList: true,
-      readonly: true,
-      hideInCreate: true,
-      hideInEdit: true,
-      customListRenderer: RunCategoriesLinkRenderer,
+      customListRenderer: RunCategoriesRenderer,
+      relation: {
+        model: 'RunCategory',
+        displayField: 'name',
+        joinTable: 'RunCategoryAssignment',
+        localKey: 'runId',
+        foreignKeyRef: 'categoryId',
+      },
     },
     {
       name: 'createdAt',

@@ -150,6 +150,13 @@ module.exports = [
         model: 'event',
         field: 'eventId',
       },
+      {
+        name: 'categories',
+        type: 'many-to-many',
+        model: 'runCategory',
+        joinTable: 'runCategoryAssignment',
+        foreignKey: 'categoryId',
+      },
     ],
   },
   {
@@ -161,10 +168,11 @@ module.exports = [
     defaultOrderBy: { sortOrder: 'asc' },
     relations: [
       {
-        name: 'run',
-        type: 'many-to-one',
+        name: 'runs',
+        type: 'many-to-many',
         model: 'run',
-        field: 'runId',
+        joinTable: 'runCategoryAssignment',
+        foreignKey: 'runId',
       },
     ],
   },

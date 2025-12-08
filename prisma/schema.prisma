@@ -277,8 +277,8 @@ model Run {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  categories    RunCategory[]
+  event         Event                   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categories    RunCategoryAssignment[]
   entryFees     RunEntryFee[]
   registrations Registration[]
   results       RunResult[]
@@ -291,9 +291,8 @@ model Run {
 
 model RunCategory {
   id        Int      @id @default(autoincrement())
-  runId     Int
   name      String
-  code      String
+  code      String   @unique
   minAge    Int?
   maxAge    Int?
   gender    String?
@@ -301,12 +300,25 @@ model RunCategory {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  run           Run            @relation(fields: [runId], references: [id], onDelete: Cascade)
+  runs          RunCategoryAssignment[]
   registrations Registration[]
   results       RunResult[]
 
-  @@unique([runId, code])
+  @@index([code])
+}
+
+// Join table for Run <-> RunCategory many-to-many relation
+
+model RunCategoryAssignment {
+  runId      Int
+  categoryId Int
+
+  run      Run         @relation(fields: [runId], references: [id], onDelete: Cascade)
+  category RunCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([runId, categoryId])
   @@index([runId])
+  @@index([categoryId])
 }
 
 // RunEntryFee (pricing by date)
