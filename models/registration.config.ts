@@ -11,7 +11,7 @@ export const registrationConfig: ModelConfig = {
   group: 'Participants',
 
   defaultSort: { field: 'registeredAt', direction: 'desc' },
-  searchFields: ['registrationNumber', 'guestFirstName', 'guestLastName', 'guestEmail'],
+  searchFields: ['registrationNumber', 'firstName', 'lastName', 'email'],
   perPage: 50,
 
   fields: [
@@ -65,20 +65,7 @@ export const registrationConfig: ModelConfig = {
       },
     },
     {
-      name: 'runnerId',
-      type: 'relation',
-      label: 'Runner Account',
-      helpText: 'Optional link to runner profile',
-      showInList: false,
-      relation: {
-        model: 'Runner',
-        displayField: 'email',
-        foreignKey: 'runnerId',
-        idType: 'string',
-      },
-    },
-    {
-      name: 'guestFirstName',
+      name: 'firstName',
       type: 'string',
       label: 'First Name',
       required: true,
@@ -90,7 +77,7 @@ export const registrationConfig: ModelConfig = {
       searchable: true,
     },
     {
-      name: 'guestLastName',
+      name: 'lastName',
       type: 'string',
       label: 'Last Name',
       required: true,
@@ -102,7 +89,7 @@ export const registrationConfig: ModelConfig = {
       searchable: true,
     },
     {
-      name: 'guestEmail',
+      name: 'email',
       type: 'string',
       label: 'Email',
       required: true,
@@ -112,7 +99,7 @@ export const registrationConfig: ModelConfig = {
       searchable: true,
     },
     {
-      name: 'guestPhone',
+      name: 'phone',
       type: 'string',
       label: 'Phone',
       placeholder: '+421 901 234 567',
@@ -120,14 +107,14 @@ export const registrationConfig: ModelConfig = {
       showInList: false,
     },
     {
-      name: 'guestDateOfBirth',
+      name: 'dateOfBirth',
       type: 'date',
       label: 'Date of Birth',
       required: true,
       showInList: false,
     },
     {
-      name: 'guestGender',
+      name: 'gender',
       type: 'select',
       label: 'Gender',
       required: true,
@@ -139,7 +126,7 @@ export const registrationConfig: ModelConfig = {
       ],
     },
     {
-      name: 'guestCity',
+      name: 'city',
       type: 'string',
       label: 'City',
       placeholder: 'Bratislava',
@@ -147,7 +134,7 @@ export const registrationConfig: ModelConfig = {
       showInList: false,
     },
     {
-      name: 'guestClub',
+      name: 'club',
       type: 'string',
       label: 'Running Club',
       placeholder: 'Bratislava Running Club',

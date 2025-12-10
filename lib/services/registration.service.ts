@@ -1,28 +1,28 @@
 import prisma from '@/lib/prisma';
-import type { Registration, Runner } from '@prisma/client';
+import type { Registration } from '@prisma/client';
 
 /**
  * Registration Service
- * Handles registration logic including guest registration,
+ * Handles registration logic including registration creation,
  * registration number generation, entry fee calculation, etc.
  */
 
 export const registrationService = {
-  createGuestRegistration,
+  createRegistration,
   generateRegistrationNumber,
   getActiveEntryFee,
   updatePaymentStatus,
   markPresented,
-  getOrCreateRunner,
   getRegistrationByNumber,
   getRegistrationsByRun,
+  getLastRegistrationByEmail,
 };
 
 /**
- * Create a guest registration
- * This is the main registration flow for public users
+ * Create a registration
+ * This is the main registration flow for all users
  */
-async function createGuestRegistration(data: {
+async function createRegistration(data: {
   runId: number;
   categoryId: number;
   firstName: string;
@@ -34,11 +34,6 @@ async function createGuestRegistration(data: {
   city?: string;
   club?: string;
 }): Promise<Registration> {
-  // Check if runner exists by email
-  const existingRunner = await prisma.runner.findUnique({
-    where: { email: data.email },
-  });
-
   // Generate registration number
   const registrationNumber = await generateRegistrationNumber(data.runId);
 
@@ -50,15 +45,14 @@ async function createGuestRegistration(data: {
     data: {
       runId: data.runId,
       categoryId: data.categoryId,
-      runnerId: existingRunner?.id,
-      guestFirstName: data.firstName,
-      guestLastName: data.lastName,
-      guestEmail: data.email,
-      guestPhone: data.phone,
-      guestDateOfBirth: data.dateOfBirth,
-      guestGender: data.gender,
-      guestCity: data.city,
-      guestClub: data.club,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      city: data.city,
+      club: data.club,
       registrationNumber,
       paidAmount: entryFee?.amount,
       status: 'pending',
@@ -70,7 +64,6 @@ async function createGuestRegistration(data: {
         },
       },
       category: true,
-      runner: true,
     },
   });
 
@@ -177,41 +170,24 @@ async function markPresented(
 }
 
 /**
- * Get or create a runner profile
- * Used to link registrations to persistent runner accounts
+ * Get last registration by email
+ * Used to pre-fill form for returning users
  */
-async function getOrCreateRunner(data: {
-  email: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
-  gender: string;
-  phone?: string;
-  city?: string;
-  club?: string;
-  userId?: string;
-}): Promise<Runner> {
-  // Try to find existing runner
-  const existing = await prisma.runner.findUnique({
-    where: { email: data.email },
-  });
-
-  if (existing) {
-    return existing;
-  }
-
-  // Create new runner
-  return prisma.runner.create({
-    data: {
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dateOfBirth: data.dateOfBirth,
-      gender: data.gender,
-      phone: data.phone,
-      city: data.city,
-      club: data.club,
-      userId: data.userId,
+async function getLastRegistrationByEmail(
+  email: string
+): Promise<Registration | null> {
+  return prisma.registration.findFirst({
+    where: { email },
+    orderBy: { registeredAt: 'desc' },
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      dateOfBirth: true,
+      gender: true,
+      city: true,
+      club: true,
     },
   });
 }
@@ -236,7 +212,6 @@ async function getRegistrationByNumber(
         },
       },
       category: true,
-      runner: true,
     },
   });
 }
@@ -261,7 +236,6 @@ async function getRegistrationsByRun(
     },
     include: {
       category: true,
-      runner: true,
     },
     orderBy: {
       registeredAt: 'desc',

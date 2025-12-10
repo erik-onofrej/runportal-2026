@@ -45,7 +45,9 @@ export async function getRunWithEvent(runId: number) {
           },
         },
         categories: {
-          orderBy: { sortOrder: 'asc' },
+          include: {
+            category: true,
+          },
         },
       },
     });
@@ -180,7 +182,9 @@ export async function getResultsByEventSlugAndRun(eventSlug: string, runId: numb
           },
         },
         categories: {
-          orderBy: { sortOrder: 'asc' },
+          include: {
+            category: true,
+          },
         },
       },
     });

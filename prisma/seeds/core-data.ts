@@ -1,5 +1,5 @@
 import prisma from '../../lib/prisma';
-import bcrypt from 'bcryptjs';
+import { auth } from '../../lib/auth';
 
 async function seedCoreData() {
   console.log('Starting core data seed...');
@@ -15,34 +15,50 @@ async function seedCoreData() {
   await prisma.verification.deleteMany();
   await prisma.user.deleteMany();
 
-  // Create admin user
+  // Create admin user using Better Auth
   console.log('Creating users...');
-  const adminPassword = await bcrypt.hash('admin123', 10);
-  const admin = await prisma.user.create({
-    data: {
-      email: 'admin@example.com',
-      name: 'Admin User',
-      role: 'admin',
-      isActive: true,
-      emailVerified: true,
-      password: adminPassword,
-    },
-  });
-  console.log('  ✓ Created admin user (email: admin@example.com, password: admin123)');
 
-  // Create regular user
-  const userPassword = await bcrypt.hash('user123', 10);
-  const user = await prisma.user.create({
-    data: {
-      email: 'user@example.com',
-      name: 'John Doe',
-      role: 'user',
-      isActive: true,
-      emailVerified: true,
-      password: userPassword,
+  // Create admin user
+  const adminResult = await auth.api.signUpEmail({
+    body: {
+      email: 'admin@example.com',
+      password: 'admin123',
+      name: 'Admin User',
     },
   });
-  console.log('  ✓ Created regular user (email: user@example.com, password: user123)');
+
+  if (adminResult && adminResult.user) {
+    // Update user to be admin
+    const admin = await prisma.user.update({
+      where: { id: adminResult.user.id },
+      data: {
+        role: 'admin',
+        emailVerified: true,
+      },
+    });
+    console.log('  ✓ Created admin user (email: admin@example.com, password: admin123)');
+
+    // Create regular user
+    const userResult = await auth.api.signUpEmail({
+      body: {
+        email: 'user@example.com',
+        password: 'user12345',
+        name: 'John Doe',
+      },
+    });
+
+    let user;
+    if (userResult && userResult.user) {
+      user = await prisma.user.update({
+        where: { id: userResult.user.id },
+        data: {
+          emailVerified: true,
+        },
+      });
+      console.log('  ✓ Created regular user (email: user@example.com, password: user12345)');
+    } else {
+      throw new Error('Failed to create regular user');
+    }
 
   // Create blog categories
   console.log('Creating blog categories...');
@@ -318,14 +334,17 @@ Good luck with your training!`,
     },
   });
 
-  console.log('  ✓ Created 3 contact submissions');
+    console.log('  ✓ Created 3 contact submissions');
 
-  console.log('Core data seed completed!');
-  console.log('Summary:');
-  console.log('  - 2 users (admin & regular user)');
-  console.log('  - 4 blog categories');
-  console.log('  - 4 blog posts (3 published, 1 draft)');
-  console.log('  - 3 contact submissions');
+    console.log('Core data seed completed!');
+    console.log('Summary:');
+    console.log('  - 2 users (admin & regular user)');
+    console.log('  - 4 blog categories');
+    console.log('  - 4 blog posts (3 published, 1 draft)');
+    console.log('  - 3 contact submissions');
+  } else {
+    throw new Error('Failed to create admin user');
+  }
 }
 
 export default seedCoreData;

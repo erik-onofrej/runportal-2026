@@ -242,27 +242,11 @@ module.exports = [
     ],
   },
   {
-    name: 'Runner',
-    modelName: 'runner',
-    idType: 'string',
-    optionField: 'firstName',
-    searchFields: ['firstName', 'lastName', 'email', 'club'],
-    defaultOrderBy: { createdAt: 'desc' },
-    relations: [
-      {
-        name: 'user',
-        type: 'many-to-one',
-        model: 'user',
-        field: 'userId',
-      },
-    ],
-  },
-  {
     name: 'Registration',
     modelName: 'registration',
     idType: 'number',
     optionField: 'registrationNumber',
-    searchFields: ['registrationNumber', 'guestFirstName', 'guestLastName', 'guestEmail'],
+    searchFields: ['registrationNumber', 'firstName', 'lastName', 'email'],
     defaultOrderBy: { registeredAt: 'desc' },
     relations: [
       {
@@ -277,12 +261,6 @@ module.exports = [
         model: 'runCategory',
         field: 'categoryId',
       },
-      {
-        name: 'runner',
-        type: 'many-to-one',
-        model: 'runner',
-        field: 'runnerId',
-      },
     ],
   },
   {
@@ -290,32 +268,14 @@ module.exports = [
     modelName: 'runResult',
     idType: 'number',
     optionField: 'id',
-    searchFields: [],
+    searchFields: ['firstName', 'lastName', 'club'],
     defaultOrderBy: { overallPlace: 'asc' },
     relations: [
-      {
-        name: 'registration',
-        type: 'many-to-one',
-        model: 'registration',
-        field: 'registrationId',
-      },
       {
         name: 'run',
         type: 'many-to-one',
         model: 'run',
         field: 'runId',
-      },
-      {
-        name: 'category',
-        type: 'many-to-one',
-        model: 'runCategory',
-        field: 'categoryId',
-      },
-      {
-        name: 'runner',
-        type: 'many-to-one',
-        model: 'runner',
-        field: 'runnerId',
       },
     ],
   },

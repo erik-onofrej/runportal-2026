@@ -18,7 +18,6 @@ import { getRunEntryFeeOptions } from '@/actions/v2/runEntryFee.actions'
 import { getEventScheduleOptions } from '@/actions/v2/eventSchedule.actions'
 import { getPartnerOptions } from '@/actions/v2/partner.actions'
 import { getEventAttachmentOptions } from '@/actions/v2/eventAttachment.actions'
-import { getRunnerOptions } from '@/actions/v2/runner.actions'
 import { getRegistrationOptions } from '@/actions/v2/registration.actions'
 import { getRunResultOptions } from '@/actions/v2/runResult.actions'
 import type { ActionResponse } from '../types/action.types'
@@ -39,7 +38,6 @@ export const optionsActionsMap: Record<string, () => Promise<ActionResponse>> = 
   eventschedule: getEventScheduleOptions,
   partner: getPartnerOptions,
   eventattachment: getEventAttachmentOptions,
-  runner: getRunnerOptions,
   registration: getRegistrationOptions,
   runresult: getRunResultOptions,
 }

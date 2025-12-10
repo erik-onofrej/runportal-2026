@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Trophy, Target, TrendingUp, Calendar, Award, Zap } from 'lucide-react';
-import { getRunnerStats } from '@/actions/runner-profile.actions';
+import { getUserStats } from '@/actions/profile.actions';
 
 function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
@@ -36,7 +36,7 @@ export default async function StatsPage() {
     redirect('/sign-in?redirect=/profile/stats');
   }
 
-  const statsResponse = await getRunnerStats();
+  const statsResponse = await getUserStats();
 
   if (!statsResponse.success || !statsResponse.data) {
     return (

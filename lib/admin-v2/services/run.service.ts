@@ -30,7 +30,7 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<Run[]>> {
       event: true,
       categories: {
         include: {
-          category: true,
+          runCategory: true,
         },
       },
       },
@@ -59,7 +59,7 @@ async function get(id: number): Promise<Run | null> {
       event: true,
       categories: {
         include: {
-          category: true,
+          runCategory: true,
         },
       },
       },
@@ -84,7 +84,7 @@ async function create(data: Prisma.RunCreateInput): Promise<Run> {
       event: true,
       categories: {
         include: {
-          category: true,
+          runCategory: true,
         },
       },
       },
@@ -117,7 +117,7 @@ async function update(id: number, data: Prisma.RunUpdateInput): Promise<Run> {
       event: true,
       categories: {
         include: {
-          category: true,
+          runCategory: true,
         },
       },
       },

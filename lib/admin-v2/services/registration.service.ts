@@ -20,9 +20,9 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<Registration
   if (search?.query) {
     where.OR = [
       { registrationNumber: { contains: search.query, mode: 'insensitive' } },
-      { guestFirstName: { contains: search.query, mode: 'insensitive' } },
-      { guestLastName: { contains: search.query, mode: 'insensitive' } },
-      { guestEmail: { contains: search.query, mode: 'insensitive' } },
+      { firstName: { contains: search.query, mode: 'insensitive' } },
+      { lastName: { contains: search.query, mode: 'insensitive' } },
+      { email: { contains: search.query, mode: 'insensitive' } },
     ]
   }
 
@@ -32,7 +32,6 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<Registration
       include: {
       run: true,
       category: true,
-      runner: true,
       },
       orderBy: orderBy || {'registeredAt':'desc'},
       skip,
@@ -58,7 +57,6 @@ async function get(id: number): Promise<Registration | null> {
       include: {
       run: true,
       category: true,
-      runner: true,
       },
   })
 }
@@ -72,7 +70,6 @@ async function create(data: Prisma.RegistrationCreateInput): Promise<Registratio
       include: {
       run: true,
       category: true,
-      runner: true,
       },
   })
 }
@@ -88,7 +85,6 @@ async function update(id: number, data: Prisma.RegistrationUpdateInput): Promise
       include: {
       run: true,
       category: true,
-      runner: true,
       },
   })
 }

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useSession } from '@/lib/auth-client';
 import {
   createRegistrationAction,
+  getLastRegistrationByEmailAction,
   type RegistrationFormData,
 } from '@/actions/registration.actions';
 import { Button } from '@/components/ui/button';
@@ -71,7 +73,9 @@ export function RegistrationForm({
   currentEntryFee,
 }: RegistrationFormProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPrefill, setIsLoadingPrefill] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<RegistrationFormData>({
@@ -89,6 +93,45 @@ export function RegistrationForm({
       club: '',
     },
   });
+
+  // Pre-fill form from user's last registration
+  useEffect(() => {
+    async function loadLastRegistration() {
+      if (!session?.user?.email) return;
+
+      setIsLoadingPrefill(true);
+      try {
+        const result = await getLastRegistrationByEmailAction(session.user.email);
+
+        if (result.success && result.registration) {
+          const reg = result.registration;
+          form.reset({
+            runId,
+            categoryId: categories[0]?.id || 0,
+            firstName: reg.firstName,
+            lastName: reg.lastName,
+            email: reg.email,
+            phone: reg.phone || '',
+            dateOfBirth: new Date(reg.dateOfBirth).toISOString().split('T')[0],
+            gender: reg.gender as 'male' | 'female' | 'other',
+            city: reg.city || '',
+            club: reg.club || '',
+          });
+        } else {
+          // No previous registration, just set email from user account
+          form.setValue('email', session.user.email);
+        }
+      } catch (err) {
+        console.error('Failed to load last registration:', err);
+        // Fallback to just setting email
+        form.setValue('email', session.user.email);
+      } finally {
+        setIsLoadingPrefill(false);
+      }
+    }
+
+    loadLastRegistration();
+  }, [session, runId, categories, form]);
 
   async function onSubmit(data: RegistrationFormData) {
     setIsSubmitting(true);
@@ -117,7 +160,9 @@ export function RegistrationForm({
       <CardHeader>
         <CardTitle>Register for {runName}</CardTitle>
         <CardDescription>
-          Fill in your details to register for this race. No account required.
+          {isLoadingPrefill
+            ? 'Loading your information...'
+            : 'Fill in your details to register for this race. No account required.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -217,6 +262,9 @@ export function RegistrationForm({
                     <FormControl>
                       <Input type="tel" placeholder="+421 900 123 456" {...field} />
                     </FormControl>
+                    <FormDescription>
+                      Optional contact number
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

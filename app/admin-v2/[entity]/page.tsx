@@ -29,7 +29,6 @@ import { getAllRunEntryFees, deleteRunEntryFee } from '@/actions/v2/runEntryFee.
 import { getAllEventSchedules, deleteEventSchedule } from '@/actions/v2/eventSchedule.actions'
 import { getAllPartners, deletePartner } from '@/actions/v2/partner.actions'
 import { getAllEventAttachments, deleteEventAttachment } from '@/actions/v2/eventAttachment.actions'
-import { getAllRunners, deleteRunner } from '@/actions/v2/runner.actions'
 import { getAllRegistrations, deleteRegistration } from '@/actions/v2/registration.actions'
 import { getAllRunResults, deleteRunResult } from '@/actions/v2/runResult.actions'
 import type { ServiceParams } from '@/lib/admin-v2/types/service.types'
@@ -57,7 +56,6 @@ const actionsMap: Record<string, {
   eventschedule: { getAll: getAllEventSchedules, delete: deleteEventSchedule as (ids: (number | string)[]) => Promise<ActionResponse> },
   partner: { getAll: getAllPartners, delete: deletePartner as (ids: (number | string)[]) => Promise<ActionResponse> },
   eventattachment: { getAll: getAllEventAttachments, delete: deleteEventAttachment as (ids: (number | string)[]) => Promise<ActionResponse> },
-  runner: { getAll: getAllRunners, delete: deleteRunner as (ids: (number | string)[]) => Promise<ActionResponse> },
   registration: { getAll: getAllRegistrations, delete: deleteRegistration as (ids: (number | string)[]) => Promise<ActionResponse> },
   runresult: { getAll: getAllRunResults, delete: deleteRunResult as (ids: (number | string)[]) => Promise<ActionResponse> },
 }

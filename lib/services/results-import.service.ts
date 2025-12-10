@@ -182,9 +182,9 @@ async function matchRegistration(
   // Strategy 3: Match by name (fuzzy)
   const nameMatches = registrations.filter((r) => {
     const firstNameMatch =
-      r.guestFirstName.toLowerCase() === row.firstName.toLowerCase();
+      r.firstName.toLowerCase() === row.firstName.toLowerCase();
     const lastNameMatch =
-      r.guestLastName.toLowerCase() === row.lastName.toLowerCase();
+      r.lastName.toLowerCase() === row.lastName.toLowerCase();
     return firstNameMatch && lastNameMatch;
   });
 
@@ -240,16 +240,6 @@ async function importResults(
 
   for (const { row, registration } of validResults) {
     try {
-      // Check if result already exists
-      const existing = await prisma.runResult.findUnique({
-        where: { registrationId: registration.id },
-      });
-
-      if (existing) {
-        skipped++;
-        continue;
-      }
-
       // Parse finish time
       let finishTime: number | null = null;
       let gunTime: number | null = null;
@@ -273,21 +263,25 @@ async function importResults(
         gunTime = parseTime(row.gunTime);
       }
 
+      // Calculate year of birth from date of birth
+      const yearOfBirth = new Date(registration.dateOfBirth).getFullYear();
+
       // Create result
       await prisma.runResult.create({
         data: {
-          registrationId: registration.id,
           runId,
-          categoryId: registration.categoryId,
-          runnerId: registration.runnerId,
+          firstName: registration.firstName,
+          lastName: registration.lastName,
+          yearOfBirth,
+          club: registration.club,
+          bibNumber: registration.bibNumber,
+          category: registration.category.name,
           overallPlace: row.overallPlace ? parseInt(row.overallPlace) : null,
           categoryPlace: row.categoryPlace ? parseInt(row.categoryPlace) : null,
           finishTime,
           gunTime,
           resultStatus: row.status.toLowerCase(),
           pace,
-          importedAt: new Date(),
-          importSource: 'csv_import',
         },
       });
 

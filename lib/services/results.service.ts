@@ -8,7 +8,6 @@ import type { RunResult } from '@prisma/client';
 
 export const resultsService = {
   getResultsByRun,
-  getResultsByRunner,
   searchResults,
   calculatePlacements,
   exportResults,
@@ -21,7 +20,7 @@ export const resultsService = {
 async function getResultsByRun(
   runId: number,
   filters?: {
-    categoryId?: number;
+    category?: string;
     resultStatus?: string;
     orderBy?: 'overallPlace' | 'categoryPlace' | 'finishTime';
     orderDirection?: 'asc' | 'desc';
@@ -31,8 +30,8 @@ async function getResultsByRun(
     runId,
   };
 
-  if (filters?.categoryId) {
-    where.categoryId = filters.categoryId;
+  if (filters?.category) {
+    where.category = filters.category;
   }
 
   if (filters?.resultStatus) {
@@ -44,27 +43,6 @@ async function getResultsByRun(
 
   return prisma.runResult.findMany({
     where,
-    include: {
-      registration: {
-        select: {
-          guestFirstName: true,
-          guestLastName: true,
-          guestEmail: true,
-          guestCity: true,
-          guestClub: true,
-          guestDateOfBirth: true,
-          bibNumber: true,
-        },
-      },
-      category: true,
-      runner: {
-        select: {
-          firstName: true,
-          lastName: true,
-          club: true,
-        },
-      },
-    },
     orderBy: {
       [orderBy]: orderDirection,
     },
@@ -72,48 +50,7 @@ async function getResultsByRun(
 }
 
 /**
- * Get all results for a specific runner
- */
-async function getResultsByRunner(
-  runnerId: string,
-  filters?: {
-    resultStatus?: string;
-    limit?: number;
-  }
-): Promise<RunResult[]> {
-  return prisma.runResult.findMany({
-    where: {
-      runnerId,
-      ...(filters?.resultStatus && { resultStatus: filters.resultStatus }),
-    },
-    include: {
-      run: {
-        include: {
-          event: {
-            select: {
-              title: true,
-              slug: true,
-              startDate: true,
-            },
-          },
-        },
-      },
-      category: true,
-      registration: {
-        select: {
-          bibNumber: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    take: filters?.limit || 100,
-  });
-}
-
-/**
- * Search results by runner name or registration number
+ * Search results by runner name
  */
 async function searchResults(
   query: string,
@@ -126,19 +63,13 @@ async function searchResults(
   const where: any = {
     OR: [
       {
-        registration: {
-          guestFirstName: { contains: query, mode: 'insensitive' },
-        },
+        firstName: { contains: query, mode: 'insensitive' },
       },
       {
-        registration: {
-          guestLastName: { contains: query, mode: 'insensitive' },
-        },
+        lastName: { contains: query, mode: 'insensitive' },
       },
       {
-        registration: {
-          registrationNumber: { contains: query, mode: 'insensitive' },
-        },
+        bibNumber: { contains: query, mode: 'insensitive' },
       },
     ],
   };
@@ -165,15 +96,6 @@ async function searchResults(
           },
         },
       },
-      registration: {
-        select: {
-          guestFirstName: true,
-          guestLastName: true,
-          registrationNumber: true,
-          bibNumber: true,
-        },
-      },
-      category: true,
     },
     orderBy: {
       overallPlace: 'asc',
@@ -207,19 +129,19 @@ async function calculatePlacements(runId: number): Promise<void> {
     });
   }
 
-  // Get all categories for this run
-  const categories = await prisma.runCategory.findMany({
-    where: {
-      runId,
-    },
+  // Get all unique categories for this run from results
+  const uniqueCategories = await prisma.runResult.findMany({
+    where: { runId },
+    select: { category: true },
+    distinct: ['category'],
   });
 
   // Update category placements
-  for (const category of categories) {
+  for (const { category } of uniqueCategories) {
     const categoryResults = await prisma.runResult.findMany({
       where: {
         runId,
-        categoryId: category.id,
+        category,
         resultStatus: 'finished',
         finishTime: { not: null },
       },
@@ -246,7 +168,6 @@ async function getResultsWithDetails(runId: number): Promise<
     categoryPlace: number | null;
     firstName: string;
     lastName: string;
-    city?: string | null;
     club?: string | null;
     bibNumber?: string | null;
     category: string;
@@ -259,11 +180,6 @@ async function getResultsWithDetails(runId: number): Promise<
 > {
   const results = await prisma.runResult.findMany({
     where: { runId },
-    include: {
-      registration: true,
-      category: true,
-      runner: true,
-    },
     orderBy: {
       overallPlace: 'asc',
     },
@@ -272,12 +188,11 @@ async function getResultsWithDetails(runId: number): Promise<
   return results.map((result) => ({
     place: result.overallPlace,
     categoryPlace: result.categoryPlace,
-    firstName: result.registration.guestFirstName,
-    lastName: result.registration.guestLastName,
-    city: result.registration.guestCity,
-    club: result.registration.guestClub || result.runner?.club,
-    bibNumber: result.registration.bibNumber,
-    category: result.category.name,
+    firstName: result.firstName,
+    lastName: result.lastName,
+    club: result.club,
+    bibNumber: result.bibNumber,
+    category: result.category,
     finishTime: result.finishTime,
     finishTimeFormatted: result.finishTime
       ? formatTime(result.finishTime)
@@ -300,7 +215,6 @@ async function exportResults(runId: number): Promise<string> {
     'Category Place',
     'First Name',
     'Last Name',
-    'City',
     'Club',
     'Bib Number',
     'Category',
@@ -316,7 +230,6 @@ async function exportResults(runId: number): Promise<string> {
       result.categoryPlace || '',
       result.firstName,
       result.lastName,
-      result.city || '',
       result.club || '',
       result.bibNumber || '',
       result.category,

@@ -23,7 +23,6 @@ import { getRunEntryFee, updateRunEntryFee } from '@/actions/v2/runEntryFee.acti
 import { getEventSchedule, updateEventSchedule } from '@/actions/v2/eventSchedule.actions'
 import { getPartner, updatePartner } from '@/actions/v2/partner.actions'
 import { getEventAttachment, updateEventAttachment } from '@/actions/v2/eventAttachment.actions'
-import { getRunner, updateRunner } from '@/actions/v2/runner.actions'
 import { getRegistration, updateRegistration } from '@/actions/v2/registration.actions'
 import { getRunResult, updateRunResult } from '@/actions/v2/runResult.actions'
 
@@ -45,7 +44,6 @@ const actionsMap: Record<string, any> = {
   eventschedule: { get: getEventSchedule, update: updateEventSchedule },
   partner: { get: getPartner, update: updatePartner },
   eventattachment: { get: getEventAttachment, update: updateEventAttachment },
-  runner: { get: getRunner, update: updateRunner },
   registration: { get: getRegistration, update: updateRegistration },
   runresult: { get: getRunResult, update: updateRunResult },
 }

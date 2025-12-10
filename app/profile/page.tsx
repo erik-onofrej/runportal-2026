@@ -3,30 +3,24 @@ import { ProfileForm } from "./_components/profile-form"
 import { SecurityForm } from "./_components/security-form"
 import { SessionsList } from "./_components/sessions-list"
 import { RunnerDashboard } from "@/components/profile/runner-dashboard"
-import { getCurrentRunnerProfile, getRunnerRegistrations, getRunnerStats } from "@/actions/runner-profile.actions"
+import { getUserProfileData, getUserRegistrations, getUserStats } from "@/actions/profile.actions"
 
 export default async function ProfilePage() {
-  // Try to fetch runner profile data
-  const runnerResult = await getCurrentRunnerProfile()
-  const runner = runnerResult.success && runnerResult.data ? runnerResult.data : null
+  // Try to fetch user profile data
+  const profileResult = await getUserProfileData()
+  const profile = profileResult.success && profileResult.data ? profileResult.data : null
 
-  // Fetch quick stats if runner exists
+  // Fetch quick stats if profile exists
   let quickStats
-  if (runner) {
-    const [upcomingResult, pastResult, statsResult] = await Promise.all([
-      getRunnerRegistrations({ status: 'upcoming' }),
-      getRunnerRegistrations({ status: 'past' }),
-      getRunnerStats(),
-    ])
+  if (profile) {
+    const statsResult = await getUserStats()
 
-    const upcomingRaces = upcomingResult.success && upcomingResult.data ? upcomingResult.data.length : 0
-    const completedRaces = pastResult.success && pastResult.data ? pastResult.data.length : 0
-    const totalDistance = statsResult.success && statsResult.data ? statsResult.data.totalDistance : 0
-
-    quickStats = {
-      upcomingRaces,
-      completedRaces,
-      totalDistance,
+    if (statsResult.success && statsResult.data) {
+      quickStats = {
+        upcomingRaces: statsResult.data.upcomingRaces,
+        completedRaces: statsResult.data.completedRaces,
+        totalDistance: statsResult.data.totalDistance,
+      }
     }
   }
 
@@ -39,17 +33,17 @@ export default async function ProfilePage() {
         </p>
       </div>
 
-      <Tabs defaultValue={runner ? "runner" : "profile"} className="space-y-6">
+      <Tabs defaultValue={profile ? "runner" : "profile"} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          {runner && <TabsTrigger value="runner">Runner Profile</TabsTrigger>}
+          {profile && <TabsTrigger value="runner">Runner Profile</TabsTrigger>}
           <TabsTrigger value="profile">Account</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
         </TabsList>
 
-        {runner && (
+        {profile && (
           <TabsContent value="runner" className="space-y-4">
-            <RunnerDashboard runner={runner} quickStats={quickStats} />
+            <RunnerDashboard runner={profile} quickStats={quickStats} />
           </TabsContent>
         )}
 

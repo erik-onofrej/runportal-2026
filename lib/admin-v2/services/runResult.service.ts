@@ -19,7 +19,9 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<RunResult[]>
   const where: Prisma.RunResultWhereInput = {}
   if (search?.query) {
     where.OR = [
-
+      { firstName: { contains: search.query, mode: 'insensitive' } },
+      { lastName: { contains: search.query, mode: 'insensitive' } },
+      { club: { contains: search.query, mode: 'insensitive' } },
     ]
   }
 
@@ -27,10 +29,7 @@ async function getAll(params: ServiceParams): Promise<ServiceResult<RunResult[]>
     prisma.runResult.findMany({
       where,
       include: {
-      registration: true,
       run: true,
-      category: true,
-      runner: true,
       },
       orderBy: orderBy || {'overallPlace':'asc'},
       skip,
@@ -54,10 +53,7 @@ async function get(id: number): Promise<RunResult | null> {
   return prisma.runResult.findUnique({
     where: { id },
       include: {
-      registration: true,
       run: true,
-      category: true,
-      runner: true,
       },
   })
 }
@@ -69,10 +65,7 @@ async function create(data: Prisma.RunResultCreateInput): Promise<RunResult> {
       ...data,
     },
       include: {
-      registration: true,
       run: true,
-      category: true,
-      runner: true,
       },
   })
 }
@@ -86,10 +79,7 @@ async function update(id: number, data: Prisma.RunResultUpdateInput): Promise<Ru
       ...data,
     },
       include: {
-      registration: true,
       run: true,
-      category: true,
-      runner: true,
       },
   })
 }
@@ -102,12 +92,18 @@ async function deleteRunResult(ids: number[]): Promise<void> {
 
 async function getOptions(): Promise<Array<{ value: number; label: string }>> {
   const items = await prisma.runResult.findMany({
-    select: { id: true, id: true },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      category: true,
+      bibNumber: true,
+    },
     orderBy: { id: 'asc' },
   })
 
   return items.map((item) => ({
     value: item.id,
-    label: item.id,
+    label: `${item.firstName} ${item.lastName} (${item.category}) ${item.bibNumber ? `#${item.bibNumber}` : ''}`.trim(),
   }))
 }

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, MapPin, Clock, ArrowRight, Trophy } from 'lucide-react';
-import { getRunnerRegistrations } from '@/actions/runner-profile.actions';
+import { getUserRegistrations } from '@/actions/profile.actions';
 
 export default async function RacesPage() {
   const session = await auth.api.getSession({
@@ -20,8 +20,8 @@ export default async function RacesPage() {
 
   // Fetch upcoming and past registrations
   const [upcomingResult, pastResult] = await Promise.all([
-    getRunnerRegistrations({ status: 'upcoming' }),
-    getRunnerRegistrations({ status: 'past' }),
+    getUserRegistrations({ status: 'upcoming' }),
+    getUserRegistrations({ status: 'past' }),
   ]);
 
   const upcomingRaces = upcomingResult.success && upcomingResult.data ? upcomingResult.data : [];

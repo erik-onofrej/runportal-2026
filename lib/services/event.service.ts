@@ -83,8 +83,13 @@ async function getEventBySlug(slug: string): Promise<Event | null> {
       runs: {
         include: {
           categories: {
+            include: {
+              category: true,
+            },
             orderBy: {
-              sortOrder: 'asc',
+              category: {
+                sortOrder: 'asc',
+              },
             },
           },
           entryFees: {
@@ -147,8 +152,13 @@ async function getEventWithFullDetails(eventId: number): Promise<
       runs: {
         include: {
           categories: {
+            include: {
+              category: true,
+            },
             orderBy: {
-              sortOrder: 'asc',
+              category: {
+                sortOrder: 'asc',
+              },
             },
           },
           entryFees: {

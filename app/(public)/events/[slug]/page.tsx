@@ -160,15 +160,15 @@ export default async function EventDetailPage({
                     <div>
                       <h4 className="font-medium mb-3">Categories</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {run.categories.map((category: any) => (
+                        {run.categories.map((categoryAssignment: any) => (
                           <div
-                            key={category.id}
+                            key={categoryAssignment.categoryId}
                             className="border rounded-lg p-3 text-sm"
                           >
-                            <div className="font-medium">{category.name}</div>
-                            {category.description && (
-                              <div className="text-muted-foreground">
-                                {category.description}
+                            <div className="font-medium">{categoryAssignment.category.name}</div>
+                            {categoryAssignment.category.code && (
+                              <div className="text-xs text-muted-foreground">
+                                {categoryAssignment.category.code}
                               </div>
                             )}
                           </div>
@@ -220,8 +220,16 @@ export default async function EventDetailPage({
 
                   <Separator />
 
-                  {/* Registration Button */}
-                  <div className="flex justify-end">
+                  {/* Registration and Participants Buttons */}
+                  <div className="flex justify-between items-center">
+                    <Link
+                      href={`/events/${event.slug}/participants?runId=${run.id}`}
+                      className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      View Participants
+                    </Link>
+
                     {isRegistrationOpen ? (
                       <Link
                         href={`/events/${event.slug}/register?runId=${run.id}`}

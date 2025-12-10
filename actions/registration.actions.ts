@@ -44,7 +44,7 @@ export async function createRegistrationAction(
     const validated = registrationSchema.parse(data);
 
     // Create registration
-    const registration = await registrationService.createGuestRegistration({
+    const registration = await registrationService.createRegistration({
       ...validated,
       dateOfBirth: new Date(validated.dateOfBirth),
     });
@@ -87,6 +87,47 @@ export async function getRegistrationByNumberAction(
       return {
         success: false,
         error: 'Registration not found',
+      };
+    }
+
+    return {
+      success: true,
+      registration,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get registration',
+    };
+  }
+}
+
+/**
+ * Get last registration by email for pre-filling form
+ */
+export async function getLastRegistrationByEmailAction(
+  email: string
+): Promise<{
+  success: boolean;
+  registration?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string | null;
+    dateOfBirth: Date;
+    gender: string;
+    city?: string | null;
+    club?: string | null;
+  };
+  error?: string;
+}> {
+  try {
+    const registration =
+      await registrationService.getLastRegistrationByEmail(email);
+
+    if (!registration) {
+      return {
+        success: false,
       };
     }
 

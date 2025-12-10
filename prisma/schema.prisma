@@ -29,7 +29,6 @@ model User {
   blogs    Blog[]
   sessions Session[]
   accounts Account[]
-  runner   Runner?
 }
 
 // Blog Model (renamed from Post)
@@ -302,7 +301,6 @@ model RunCategory {
 
   runs          RunCategoryAssignment[]
   registrations Registration[]
-  results       RunResult[]
 
   @@index([code])
 }
@@ -413,46 +411,20 @@ model EventAttachment {
   @@index([eventId])
 }
 
-// Runner (guest-first, optional accounts)
-
-model Runner {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  userId      String?  @unique
-  firstName   String
-  lastName    String
-  dateOfBirth DateTime
-  gender      String
-  phone       String?
-  city        String?
-  country     String?  @default("Slovakia")
-  club        String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
-  registrations Registration[]
-  results       RunResult[]
-
-  @@index([email])
-  @@index([userId])
-}
-
 // Registration (sign-ups for runs)
 
 model Registration {
   id                 Int      @id @default(autoincrement())
   runId              Int
   categoryId         Int
-  runnerId           String?
-  guestFirstName     String
-  guestLastName      String
-  guestEmail         String
-  guestPhone         String?
-  guestDateOfBirth   DateTime
-  guestGender        String
-  guestCity          String?
-  guestClub          String?
+  firstName          String
+  lastName           String
+  email              String
+  phone              String?
+  dateOfBirth        DateTime
+  gender             String
+  city               String?
+  club               String?
   registrationNumber String   @unique
   registeredAt       DateTime @default(now())
   paid               Boolean  @default(false)
@@ -468,13 +440,10 @@ model Registration {
 
   run      Run         @relation(fields: [runId], references: [id], onDelete: Cascade)
   category RunCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  runner   Runner?     @relation(fields: [runnerId], references: [id], onDelete: SetNull)
-  result   RunResult?
 
   @@index([runId])
   @@index([categoryId])
-  @@index([runnerId])
-  @@index([guestEmail])
+  @@index([email])
   @@index([registrationNumber])
   @@index([status])
 }
@@ -482,31 +451,26 @@ model Registration {
 // RunResult (race outcomes)
 
 model RunResult {
-  id             Int       @id @default(autoincrement())
-  registrationId Int       @unique
-  runId          Int
-  categoryId     Int
-  runnerId       String?
-  overallPlace   Int?
-  categoryPlace  Int?
-  finishTime     Int?
-  gunTime        Int?
-  resultStatus   String    @default("finished")
-  pace           Float?
-  splits         Json?
-  importedAt     DateTime?
-  importSource   String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            Int      @id @default(autoincrement())
+  runId         Int
+  firstName     String
+  lastName      String
+  yearOfBirth   Int
+  club          String?
+  bibNumber     String?
+  category      String
+  overallPlace  Int?
+  categoryPlace Int?
+  finishTime    Int?
+  gunTime       Int?
+  resultStatus  String   @default("finished")
+  pace          Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
-  run          Run          @relation(fields: [runId], references: [id], onDelete: Cascade)
-  category     RunCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  runner       Runner?      @relation(fields: [runnerId], references: [id], onDelete: SetNull)
+  run Run @relation(fields: [runId], references: [id], onDelete: Cascade)
 
   @@index([runId])
-  @@index([categoryId])
-  @@index([runnerId])
   @@index([overallPlace])
   @@index([resultStatus])
 }

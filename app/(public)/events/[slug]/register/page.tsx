@@ -74,6 +74,13 @@ export default async function RegisterPage({
     new Date()
   );
 
+  // Transform categories from RunCategoryAssignment[] to the format expected by RegistrationForm
+  const categories = run.categories?.map((assignment: any) => ({
+    id: assignment.category.id,
+    name: assignment.category.name,
+    description: assignment.category.code || null,
+  })) || [];
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Event Summary */}
@@ -133,7 +140,7 @@ export default async function RegisterPage({
         runId={run.id}
         runName={run.name}
         eventSlug={slug}
-        categories={run.categories || []}
+        categories={categories}
         currentEntryFee={currentEntryFee}
       />
 

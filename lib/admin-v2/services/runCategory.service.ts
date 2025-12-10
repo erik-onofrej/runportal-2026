@@ -94,7 +94,7 @@ async function update(id: number, data: Prisma.RunCategoryUpdateInput): Promise<
 
   if (runs !== undefined) {
     await prisma.runCategoryAssignment.deleteMany({
-      where: { categoryId: id },
+      where: { runCategoryId: id },
     })
   }
 

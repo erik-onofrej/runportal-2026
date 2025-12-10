@@ -23,7 +23,6 @@ import { createRunEntryFee } from '@/actions/v2/runEntryFee.actions'
 import { createEventSchedule } from '@/actions/v2/eventSchedule.actions'
 import { createPartner } from '@/actions/v2/partner.actions'
 import { createEventAttachment } from '@/actions/v2/eventAttachment.actions'
-import { createRunner } from '@/actions/v2/runner.actions'
 import { createRegistration } from '@/actions/v2/registration.actions'
 import { createRunResult } from '@/actions/v2/runResult.actions'
 
@@ -45,7 +44,6 @@ const createActionsMap: Record<string, any> = {
   eventschedule: createEventSchedule,
   partner: createPartner,
   eventattachment: createEventAttachment,
-  runner: createRunner,
   registration: createRegistration,
   runresult: createRunResult,
 }

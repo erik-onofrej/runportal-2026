@@ -15,7 +15,6 @@ import { runEntryFeeConfig } from '@/models/runEntryFee.config'
 import { eventScheduleConfig } from '@/models/eventSchedule.config'
 import { partnerConfig } from '@/models/partner.config'
 import { eventAttachmentConfig } from '@/models/eventAttachment.config'
-import { runnerConfig } from '@/models/runner.config'
 import { registrationConfig } from '@/models/registration.config'
 import { runResultConfig } from '@/models/runResult.config'
 
@@ -40,7 +39,6 @@ export const adminConfig: AdminConfig = {
     eventScheduleConfig,
     partnerConfig,
     eventAttachmentConfig,
-    runnerConfig,
     registrationConfig,
     runResultConfig,
   ],
