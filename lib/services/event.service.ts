@@ -1,5 +1,7 @@
 import prisma from '@/lib/prisma';
 import type { Event, Run } from '@prisma/client';
+import { regionService } from '@/lib/admin-v2/services/region.service';
+import { organizerService } from '@/lib/admin-v2/services/organizer.service';
 
 /**
  * Event Service
@@ -12,6 +14,8 @@ export const eventService = {
   getEventWithFullDetails,
   searchEvents,
   getEventsByFilters,
+  getRegionOptions,
+  getOrganizerOptions,
 };
 
 /**
@@ -303,6 +307,12 @@ async function getEventsByFilters(filters: {
   startDateFrom?: Date;
   startDateTo?: Date;
   status?: string;
+  search?: string;
+  minDistance?: number;
+  maxDistance?: number;
+  minElevation?: number;
+  maxElevation?: number;
+  surface?: string;
   limit?: number;
   offset?: number;
 }): Promise<{ events: Event[]; total: number }> {
@@ -311,6 +321,14 @@ async function getEventsByFilters(filters: {
   const where: any = {
     status: whereFilters.status || 'published',
   };
+
+  // Search by event title or description
+  if (whereFilters.search) {
+    where.OR = [
+      { title: { contains: whereFilters.search, mode: 'insensitive' } },
+      { description: { contains: whereFilters.search, mode: 'insensitive' } },
+    ];
+  }
 
   if (whereFilters.organizerId) {
     where.organizerId = whereFilters.organizerId;
@@ -340,6 +358,43 @@ async function getEventsByFilters(filters: {
     }
   }
 
+  // Filter by run properties (distance, elevation, surface)
+  const runFilters: any = {};
+
+  if (whereFilters.minDistance !== undefined || whereFilters.maxDistance !== undefined) {
+    runFilters.distance = {};
+    if (whereFilters.minDistance !== undefined) {
+      runFilters.distance.gte = whereFilters.minDistance;
+    }
+    if (whereFilters.maxDistance !== undefined) {
+      runFilters.distance.lte = whereFilters.maxDistance;
+    }
+  }
+
+  if (whereFilters.minElevation !== undefined || whereFilters.maxElevation !== undefined) {
+    runFilters.elevationGain = {};
+    if (whereFilters.minElevation !== undefined) {
+      runFilters.elevationGain.gte = whereFilters.minElevation;
+    }
+    if (whereFilters.maxElevation !== undefined) {
+      runFilters.elevationGain.lte = whereFilters.maxElevation;
+    }
+  }
+
+  if (whereFilters.surface) {
+    runFilters.surface = {
+      contains: whereFilters.surface,
+      mode: 'insensitive',
+    };
+  }
+
+  // Only add runs filter if there are run-specific filters
+  if (Object.keys(runFilters).length > 0) {
+    where.runs = {
+      some: runFilters,
+    };
+  }
+
   const [events, total] = await Promise.all([
     prisma.event.findMany({
       where,
@@ -367,4 +422,18 @@ async function getEventsByFilters(filters: {
   ]);
 
   return { events, total };
+}
+
+/**
+ * Get region options for filters
+ */
+async function getRegionOptions(): Promise<Array<{ value: number; label: string }>> {
+  return regionService.getOptions();
+}
+
+/**
+ * Get organizer options for filters
+ */
+async function getOrganizerOptions(): Promise<Array<{ value: number; label: string }>> {
+  return organizerService.getOptions();
 }

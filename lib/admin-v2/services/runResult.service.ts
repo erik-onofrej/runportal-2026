@@ -92,18 +92,12 @@ async function deleteRunResult(ids: number[]): Promise<void> {
 
 async function getOptions(): Promise<Array<{ value: number; label: string }>> {
   const items = await prisma.runResult.findMany({
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      category: true,
-      bibNumber: true,
-    },
+    select: { id: true, id: true },
     orderBy: { id: 'asc' },
   })
 
   return items.map((item) => ({
     value: item.id,
-    label: `${item.firstName} ${item.lastName} (${item.category}) ${item.bibNumber ? `#${item.bibNumber}` : ''}`.trim(),
+    label: item.id,
   }))
 }

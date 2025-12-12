@@ -58,20 +58,19 @@ function generateResults(
     const pace = finishTimeSeconds / distance / 60; // min/km
 
     return {
-      registrationId: reg.id, // Will need to be set after registration is created
       runId,
-      categoryId: reg.categoryId,
       firstName: reg.firstName,
       lastName: reg.lastName,
       yearOfBirth: reg.dateOfBirth.getFullYear(),
       club: reg.club,
+      bibNumber: reg.bibNumber,
+      category: reg.category.name, // Get category name from the registration's category relation
       overallPlace: index + 1,
       categoryPlace: index + 1, // Simplified, would need category-specific calculation
       finishTime: finishTimeSeconds,
       gunTime: finishTimeSeconds + Math.floor(Math.random() * 60), // Add random start delay
       resultStatus: 'finished',
       pace,
-      splits: null,
     };
   });
 }
@@ -937,7 +936,10 @@ async function seedSampleEvents() {
   );
   const createdAutumnRegs = [];
   for (const reg of autumnTrailRegistrations) {
-    const created = await prisma.registration.create({ data: reg });
+    const created = await prisma.registration.create({
+      data: reg,
+      include: { category: true },
+    });
     createdAutumnRegs.push(created);
   }
   registrationCounter += 80;
@@ -946,10 +948,7 @@ async function seedSampleEvents() {
   const autumnTrailResults = generateResults(createdAutumnRegs, autumnTrailRun.id, 15.0);
   for (const result of autumnTrailResults) {
     await prisma.runResult.create({
-      data: {
-        ...result,
-        registrationId: createdAutumnRegs[autumnTrailResults.indexOf(result)].id,
-      },
+      data: result,
     });
   }
 
@@ -963,7 +962,10 @@ async function seedSampleEvents() {
   );
   const createdWinterRegs = [];
   for (const reg of winterChallengeRegistrations) {
-    const created = await prisma.registration.create({ data: reg });
+    const created = await prisma.registration.create({
+      data: reg,
+      include: { category: true },
+    });
     createdWinterRegs.push(created);
   }
   registrationCounter += 95;
@@ -972,10 +974,7 @@ async function seedSampleEvents() {
   const winterChallengeResults = generateResults(createdWinterRegs, winterChallenge10k.id, 10.0);
   for (const result of winterChallengeResults) {
     await prisma.runResult.create({
-      data: {
-        ...result,
-        registrationId: createdWinterRegs[winterChallengeResults.indexOf(result)].id,
-      },
+      data: result,
     });
   }
 
@@ -989,7 +988,10 @@ async function seedSampleEvents() {
   );
   const createdNightRegs = [];
   for (const reg of nightRunRegistrations) {
-    const created = await prisma.registration.create({ data: reg });
+    const created = await prisma.registration.create({
+      data: reg,
+      include: { category: true },
+    });
     createdNightRegs.push(created);
   }
   registrationCounter += 72;
@@ -998,10 +1000,7 @@ async function seedSampleEvents() {
   const nightRunResults = generateResults(createdNightRegs, nightRun8k.id, 8.0);
   for (const result of nightRunResults) {
     await prisma.runResult.create({
-      data: {
-        ...result,
-        registrationId: createdNightRegs[nightRunResults.indexOf(result)].id,
-      },
+      data: result,
     });
   }
 

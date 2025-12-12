@@ -113,6 +113,8 @@ export const blogService = {
         id: true,
         title: true,
         slug: true,
+        excerpt: true,
+        thumbnailUrl: true,
         publishedAt: true,
       },
       orderBy: {
