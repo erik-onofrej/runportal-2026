@@ -28,6 +28,9 @@ export function EventsFilter({ regions }: EventsFilterProps) {
   const endDate = searchParams.get('endDate') || '';
   const surface = searchParams.get('surface') || '';
 
+  // Local state for search input (for debouncing)
+  const [searchInput, setSearchInput] = useState(searchQuery);
+
   // Distance range (0-100+ km)
   const [distanceRange, setDistanceRange] = useState<number[]>([
     Number(searchParams.get('minDistance')) || 0,
@@ -39,6 +42,20 @@ export function EventsFilter({ regions }: EventsFilterProps) {
     Number(searchParams.get('minElevation')) || 0,
     Number(searchParams.get('maxElevation')) || 3000,
   ]);
+
+  // Sync search input with URL params when they change externally (e.g., clear filters)
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateFilter('search', searchInput || null);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const updateFilter = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -97,13 +114,14 @@ export function EventsFilter({ regions }: EventsFilterProps) {
   };
 
   const clearFilters = () => {
+    setSearchInput('');
     setDistanceRange([0, 100]);
     setElevationRange([0, 3000]);
     router.push('/events');
   };
 
   const hasActiveFilters =
-    regionId || searchQuery || startDate || endDate || surface ||
+    regionId || searchInput || startDate || endDate || surface ||
     distanceRange[0] > 0 || distanceRange[1] < 100 ||
     elevationRange[0] > 0 || elevationRange[1] < 3000;
 
@@ -132,8 +150,8 @@ export function EventsFilter({ regions }: EventsFilterProps) {
             <Input
               type="text"
               placeholder="Event name..."
-              value={searchQuery}
-              onChange={(e) => updateFilter('search', e.target.value || null)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-9"
             />
           </div>

@@ -110,6 +110,8 @@ async function seedCoreData() {
     data: {
       title: 'Getting Started with Running: A Beginner\'s Guide',
       slug: 'getting-started-with-running',
+      excerpt: 'Running is one of the most accessible forms of exercise. Whether you\'re looking to improve your fitness, lose weight, or train for your first race, this guide will help you get started.',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=600&h=400&fit=crop',
       content: `# Getting Started with Running
 
 Running is one of the most accessible forms of exercise. Whether you're looking to improve your fitness, lose weight, or train for your first race, this guide will help you get started on the right foot.
@@ -155,6 +157,8 @@ Remember, everyone progresses at their own pace. The key is to stay consistent a
     data: {
       title: 'Top 10 Running Events in Slovakia 2025',
       slug: 'top-10-running-events-slovakia-2025',
+      excerpt: 'Slovakia offers some amazing running events throughout the year. From marathons to trail runs, discover our top picks for 2025!',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=600&h=400&fit=crop',
       content: `# Top 10 Running Events in Slovakia 2025
 
 Slovakia offers some amazing running events throughout the year. From marathons to trail runs, there's something for every runner. Here are our top picks for 2025!
@@ -199,6 +203,8 @@ Check back for more event announcements and registration information.`,
     data: {
       title: 'Building a Running Event Website with Next.js',
       slug: 'building-running-event-website-nextjs',
+      excerpt: 'Learn how to build a comprehensive running event management platform using Next.js 16, TypeScript, and Prisma.',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop',
       content: `# Building a Running Event Website with Next.js
 
 In this post, I'll share my experience building a comprehensive running event management platform using Next.js 16, TypeScript, and Prisma.
@@ -251,6 +257,8 @@ Stay tuned for more technical deep-dives!`,
     data: {
       title: 'Training for Your First Half Marathon',
       slug: 'training-first-half-marathon',
+      excerpt: 'Ready to take on 21.1 kilometers? Here\'s a complete 12-week training plan and essential tips to prepare for your first half marathon.',
+      thumbnailUrl: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&h=400&fit=crop',
       content: `# Training for Your First Half Marathon
 
 Ready to take on the challenge of 21.1 kilometers? Here's everything you need to know to prepare for your first half marathon.
